@@ -1,3 +1,6 @@
 scaffold.sql
 sqlboiler.toml
 .env
+
+.idea
+.vscode
