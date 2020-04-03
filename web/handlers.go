@@ -26,15 +26,15 @@ func (env *Env) HealthCheck(w http.ResponseWriter, r *http.Request) {
 type trackWithRels struct {
 	ID      int         `boil:"id" json:"id"`
 	Name    string      `boil:"name" json:"name"`
-	Artists []ArtistRel `boil:"artists" json:"artists"`
+	Artists []artistRel `boil:"artists" json:"artists"`
 }
 
-type ArtistRel struct {
+type artistRel struct {
 	ID   int
 	Name string
 }
 
-// tracksIndex returns a listing of Tracks.
+// TracksIndex returns a listing of Tracks.
 func (env *Env) TracksIndex(w http.ResponseWriter, r *http.Request) {
 	validateRequestMethod(w, r, http.MethodGet)
 
@@ -48,9 +48,9 @@ func (env *Env) TracksIndex(w http.ResponseWriter, r *http.Request) {
 	var tracksWithRels []trackWithRels
 	for _, track := range tracks {
 		// Build associated ArtistRel structs.
-		var artistRels []ArtistRel
+		var artistRels []artistRel
 		for _, artist := range track.R.Artists {
-			artistRels = append(artistRels, ArtistRel{
+			artistRels = append(artistRels, artistRel{
 				ID:   artist.ID,
 				Name: artist.Name,
 			})
@@ -67,15 +67,15 @@ func (env *Env) TracksIndex(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(tracksWithRels)
 }
 
-// tracksShow returns a single Track matching a given ID.
+// TracksShow returns a single Track matching a given ID.
 func (env *Env) TracksShow(w http.ResponseWriter, r *http.Request) {
 	validateRequestMethod(w, r, http.MethodGet)
 
 	var track *models.Track
 
 	if id := chi.URLParam(r, "id"); id != "" {
-		intId, _ := strconv.Atoi(id)
-		track, _ = models.FindTrack(context.Background(), env.DB, intId)
+		intID, _ := strconv.Atoi(id)
+		track, _ = models.FindTrack(context.Background(), env.DB, intID)
 	}
 
 	if track == nil {
@@ -86,7 +86,7 @@ func (env *Env) TracksShow(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(track)
 }
 
-// tracksCreate inserts and returns a new Track.
+// TracksCreate inserts and returns a new Track.
 func (env *Env) TracksCreate(w http.ResponseWriter, r *http.Request) {
 	validateRequestMethod(w, r, http.MethodPost)
 
@@ -116,15 +116,15 @@ func (env *Env) TracksCreate(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(track)
 }
 
-// tracksUpdate mutates an existing Track and returns it.
+// TracksUpdate mutates an existing Track and returns it.
 func (env *Env) TracksUpdate(w http.ResponseWriter, r *http.Request) {
 	validateRequestMethod(w, r, http.MethodPut)
 
 	var track *models.Track
 
 	if id := chi.URLParam(r, "id"); id != "" {
-		intId, _ := strconv.Atoi(id)
-		track, _ = models.FindTrack(context.Background(), env.DB, intId)
+		intID, _ := strconv.Atoi(id)
+		track, _ = models.FindTrack(context.Background(), env.DB, intID)
 	}
 
 	// If the Track to be updated is not found the client should be notified.
@@ -157,15 +157,15 @@ func (env *Env) TracksUpdate(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(track)
 }
 
-// tracksDelete removes an existing Track.
+// TracksDelete removes an existing Track.
 func (env *Env) TracksDelete(w http.ResponseWriter, r *http.Request) {
 	validateRequestMethod(w, r, http.MethodDelete)
 
 	var track *models.Track
 
 	if id := chi.URLParam(r, "id"); id != "" {
-		intId, _ := strconv.Atoi(id)
-		track, _ = models.FindTrack(context.Background(), env.DB, intId)
+		intID, _ := strconv.Atoi(id)
+		track, _ = models.FindTrack(context.Background(), env.DB, intID)
 	}
 
 	// If the Track to be deleted is not found the client should be notified.

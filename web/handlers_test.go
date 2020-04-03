@@ -12,7 +12,7 @@ import (
 
 func TestTracksCreate(t *testing.T) {
 	// TODO: Stub out actual DB writes.
-	env := &Env{db: db.Connection()}
+	env := &Env{DB: db.Connection()}
 	payload, _ := json.Marshal(map[string]interface{}{"name": "test"})
 
 	r, err := http.NewRequest("POST", "http://localhost:4000/tracks", bytes.NewBuffer(payload))
@@ -24,7 +24,7 @@ func TestTracksCreate(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	// Call handler that we're wanting to test.
-	env.tracksCreate(w, r)
+	env.TracksCreate(w, r)
 
 	res := w.Result()
 	defer res.Body.Close()
