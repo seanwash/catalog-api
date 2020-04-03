@@ -59,6 +59,10 @@ func main() {
 }
 
 func registerRoutes(env *web.Env, r *chi.Mux) {
+	// Misc
+	r.Get("/healthz", env.HealthCheck)
+
+	// Track Routing
 	r.Get("/tracks", env.TracksIndex)
 	r.Get("/tracks/{id}", env.TracksShow)
 	r.Post("/tracks", env.TracksCreate)

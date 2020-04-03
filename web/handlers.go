@@ -15,6 +15,12 @@ import (
 	"github.com/volatiletech/sqlboiler/boil"
 )
 
+// HealthCheck responds with a 200 status. Used for zero downtime deploys and
+// uptime monitors.
+func (env *Env) HealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+}
+
 // TODO: Note that these are views and can be used to control the presentation
 // in case there are fields that shouldn't be exposed to the client.
 type trackWithRels struct {
