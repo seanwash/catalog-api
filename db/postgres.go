@@ -12,7 +12,7 @@ import (
 )
 
 func Connection() *sql.DB {
-	dbUrl := os.Getenv("DB_URL")
+	dbUrl := os.Getenv("DATABASE_URL")
 	logSqlStr := os.Getenv("LOG_SQL")
 	logSql, err := strconv.ParseBool(logSqlStr)
 	if err != nil {

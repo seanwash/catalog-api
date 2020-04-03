@@ -11,8 +11,8 @@ sqlboil:
 
 .PHONY: db.migrate
 db.migrate:
-	migrate -path ./db/migrations -database ${DB_URL} up
+	migrate -path ./db/migrations -database ${DATABASE_URL} up
 
 .PHONY: db.rollback
 db.rollback:
-	migrate -path ./db/migrations -database ${DB_URL} down 1
+	migrate -path ./db/migrations -database ${DATABASE_URL} down 1
