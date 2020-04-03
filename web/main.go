@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/seanwash/catalog-api/db"
@@ -26,6 +27,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
+	port := os.Getenv("PORT")
 	dbConn := db.Connection()
 	env := &Env{db: dbConn}
 	defer dbConn.Close()
@@ -42,19 +44,20 @@ func main() {
 	r.Use(middleware.Recoverer)
 	// Stores a URL's extension in each request context.
 	r.Use(middleware.URLFormat)
-	// Always set content-type json header.
+	// Always set content-type JSON header.
 	r.Use(render.SetContentType(render.ContentTypeJSON))
 
 	// Set a timeout value on the request context (ctx), that will signal
-	// through ctx.Done() that the request has timed out and further
-	// processing should be stopped.
+	// through ctx.Done() that the request has timed out and further processing
+	// should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	// Routes
 	registerRoutes(env, r)
 
 	// Serve
-	if err := http.ListenAndServe(":4000", r); err != nil {
+	log.Println("Application started on port :" + port)
+	if err := http.ListenAndServe(":"+port, r); err != nil {
 		log.Fatal(err)
 	}
 }
