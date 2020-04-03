@@ -1,4 +1,0 @@
-[metadata.heroku]
-  root-package = "github.com/seanwash/catalog-api"
-  go-version = "go1.14"
-  additional-tools = ["github.com/golang-migrate/migrate"]
