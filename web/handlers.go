@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"context"
@@ -29,10 +29,10 @@ type ArtistRel struct {
 }
 
 // tracksIndex returns a listing of Tracks.
-func (env *Env) tracksIndex(w http.ResponseWriter, r *http.Request) {
+func (env *Env) TracksIndex(w http.ResponseWriter, r *http.Request) {
 	validateRequestMethod(w, r, http.MethodGet)
 
-	tracks, err := models.Tracks(qm.Load(models.TrackRels.Artists)).All(context.Background(), env.db)
+	tracks, err := models.Tracks(qm.Load(models.TrackRels.Artists)).All(context.Background(), env.DB)
 	if err != nil {
 		// TODO: Change this
 		log.Fatal(err)
@@ -58,18 +58,18 @@ func (env *Env) tracksIndex(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	err = json.NewEncoder(w).Encode(tracksWithRels)
+	json.NewEncoder(w).Encode(tracksWithRels)
 }
 
 // tracksShow returns a single Track matching a given ID.
-func (env *Env) tracksShow(w http.ResponseWriter, r *http.Request) {
+func (env *Env) TracksShow(w http.ResponseWriter, r *http.Request) {
 	validateRequestMethod(w, r, http.MethodGet)
 
 	var track *models.Track
 
 	if id := chi.URLParam(r, "id"); id != "" {
 		intId, _ := strconv.Atoi(id)
-		track, _ = models.FindTrack(context.Background(), env.db, intId)
+		track, _ = models.FindTrack(context.Background(), env.DB, intId)
 	}
 
 	if track == nil {
@@ -81,7 +81,7 @@ func (env *Env) tracksShow(w http.ResponseWriter, r *http.Request) {
 }
 
 // tracksCreate inserts and returns a new Track.
-func (env *Env) tracksCreate(w http.ResponseWriter, r *http.Request) {
+func (env *Env) TracksCreate(w http.ResponseWriter, r *http.Request) {
 	validateRequestMethod(w, r, http.MethodPost)
 
 	var payload map[string]interface{}
@@ -101,7 +101,7 @@ func (env *Env) tracksCreate(w http.ResponseWriter, r *http.Request) {
 	track.Name = payload["name"].(string)
 
 	// Insert Track.
-	if err := track.Insert(context.Background(), env.db, boil.Infer()); err != nil {
+	if err := track.Insert(context.Background(), env.DB, boil.Infer()); err != nil {
 		EncodeJSONError(w, err, http.StatusBadRequest)
 		return
 	}
@@ -111,14 +111,14 @@ func (env *Env) tracksCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 // tracksUpdate mutates an existing Track and returns it.
-func (env *Env) tracksUpdate(w http.ResponseWriter, r *http.Request) {
+func (env *Env) TracksUpdate(w http.ResponseWriter, r *http.Request) {
 	validateRequestMethod(w, r, http.MethodPut)
 
 	var track *models.Track
 
 	if id := chi.URLParam(r, "id"); id != "" {
 		intId, _ := strconv.Atoi(id)
-		track, _ = models.FindTrack(context.Background(), env.db, intId)
+		track, _ = models.FindTrack(context.Background(), env.DB, intId)
 	}
 
 	// If the Track to be updated is not found the client should be notified.
@@ -142,7 +142,7 @@ func (env *Env) tracksUpdate(w http.ResponseWriter, r *http.Request) {
 	track.Name = payload["name"].(string)
 
 	// Update the existing Track.
-	if _, err := track.Update(context.Background(), env.db, boil.Infer()); err != nil {
+	if _, err := track.Update(context.Background(), env.DB, boil.Infer()); err != nil {
 		EncodeJSONError(w, err, http.StatusBadRequest)
 		return
 	}
@@ -152,14 +152,14 @@ func (env *Env) tracksUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 // tracksDelete removes an existing Track.
-func (env *Env) tracksDelete(w http.ResponseWriter, r *http.Request) {
+func (env *Env) TracksDelete(w http.ResponseWriter, r *http.Request) {
 	validateRequestMethod(w, r, http.MethodDelete)
 
 	var track *models.Track
 
 	if id := chi.URLParam(r, "id"); id != "" {
 		intId, _ := strconv.Atoi(id)
-		track, _ = models.FindTrack(context.Background(), env.db, intId)
+		track, _ = models.FindTrack(context.Background(), env.DB, intId)
 	}
 
 	// If the Track to be deleted is not found the client should be notified.
@@ -168,7 +168,7 @@ func (env *Env) tracksDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := track.Delete(context.Background(), env.db); err != nil {
+	if _, err := track.Delete(context.Background(), env.DB); err != nil {
 		EncodeJSONError(w, err, http.StatusBadRequest)
 		return
 	}

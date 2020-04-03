@@ -1,11 +1,12 @@
 package main
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/seanwash/catalog-api/web"
 
 	"github.com/seanwash/catalog-api/db"
 
@@ -16,11 +17,6 @@ import (
 	"github.com/go-chi/render"
 )
 
-// Env facilitates injecting dependencies into route handlers.
-type Env struct {
-	db *sql.DB
-}
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -29,7 +25,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	dbConn := db.Connection()
-	env := &Env{db: dbConn}
+	env := &web.Env{DB: dbConn}
 	defer dbConn.Close()
 
 	r := chi.NewRouter()
@@ -62,10 +58,10 @@ func main() {
 	}
 }
 
-func registerRoutes(env *Env, r *chi.Mux) {
-	r.Get("/tracks", env.tracksIndex)
-	r.Get("/tracks/{id}", env.tracksShow)
-	r.Post("/tracks", env.tracksCreate)
-	r.Put("/tracks/{id}", env.tracksUpdate)
-	r.Delete("/tracks/{id}", env.tracksDelete)
+func registerRoutes(env *web.Env, r *chi.Mux) {
+	r.Get("/tracks", env.TracksIndex)
+	r.Get("/tracks/{id}", env.TracksShow)
+	r.Post("/tracks", env.TracksCreate)
+	r.Put("/tracks/{id}", env.TracksUpdate)
+	r.Delete("/tracks/{id}", env.TracksDelete)
 }

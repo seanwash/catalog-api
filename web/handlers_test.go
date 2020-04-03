@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 func TestTracksCreate(t *testing.T) {
 	// TODO: Stub out actual DB writes.
 	env := &Env{db: db.Connection()}
-	payload, err := json.Marshal(map[string]interface{}{"name": "test"})
+	payload, _ := json.Marshal(map[string]interface{}{"name": "test"})
 
 	r, err := http.NewRequest("POST", "http://localhost:4000/tracks", bytes.NewBuffer(payload))
 	if err != nil {
