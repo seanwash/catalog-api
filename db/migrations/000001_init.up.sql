@@ -20,11 +20,15 @@ create table artists
     name text   not null
 );
 
+create unique index artists_lower_case_name_index on artists ((lower(name)));
+
 create table genres
 (
     id   serial not null primary key,
     name text   not null
 );
+
+create unique index genres_lower_case_name_index on genres ((lower(name)));
 
 --
 -- Join Tables
