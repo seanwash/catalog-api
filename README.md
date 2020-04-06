@@ -12,17 +12,17 @@ features that you think will make your API better to consume.
 
 1. Clone repository.
 1. Ensure that Docker is installed & running.
-1. Obtain `.env` file (Attached via email).
-1. Run `$ docker-compose up -d` from the project root. This will build and start both the Web and Postgres services.
-1. Run `$ docker-compose run --rm web make db.up`. This will run the initial migrations.
+1. Obtain `.env` file. For development, an `.env.sample` file has been provided with values suitable for this demo.
+1. Run `$ docker-compose up -d` from the project root. This will build and start both the Web and Postgres services, keeping them running in the background. If you'd like to see logs, you can skip `-d`, but you'll have to run the following commands in another terminal.
+1. Run `$ docker-compose run --rm web make db.up`. This will run the initial migrations. Note that `--rm` will remove the container that was created to run the command. This is fine since the container we want to keep is already running the web instance.
 1. Run `$ docker-compose run --rm web go run cmd/seeds/main.go`. This will pre-seed the database with some albums from one of my favorite artists, [Plini](https://www.youtube.com/watch?v=oNFXnFAKqAE).
 1. Import the Insomnia export (attached via email) and fire away!
 
 ## Using the API
 
-The attached Insomnia workspace will include a number of sample queries and mutations for you to try out. All types, queries, and mutations are documented so don't forget to check out the documentation pane!
+The attached Insomnia workspace will include a number of sample queries and mutations for you to try out. Don't forget to check out the documentation pane!
 
-One thing to note is that any mutations are protected and can be accessed by sending an `API-KEY` header along with the request. The Insomnia workspace should have this pre configured, so give the mutations a try with and without the header.
+One thing to note is that all mutations are protected and can be accessed by sending an `API-KEY` header along with the request. The Insomnia workspace should have this pre configured, so give the mutations a try with and without the header.
 
 Additionally, a live API is available at https://catalog-api.onrender.com. The exported Insomnia workspace contains a production environment as well as a development environment.
 
