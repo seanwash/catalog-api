@@ -27,7 +27,6 @@ func main() {
 		log.Println("No .env file found")
 	}
 
-	// TODO: Move this to a middleware so that it can be accessed through context?
 	port := os.Getenv("PORT")
 	dbConn := db.Connection()
 	defer dbConn.Close()
