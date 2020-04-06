@@ -18,6 +18,6 @@ RUN go get -u github.com/pressly/goose/cmd/goose
 COPY . .
 
 # Compile main binary used for starting the server.
-RUN go build -o bin/server ./cmd/server/main.go
+RUN go build -o /app/bin/server ./cmd/server/main.go
 # Run server.
-CMD ["/app/server"]
+CMD ["/app/bin/server"]
