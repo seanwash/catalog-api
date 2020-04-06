@@ -77,7 +77,7 @@ The most important dependencies are:
 
 ### Dataloader
 
-It's really easy to introduce a ton of N+1 queries into a GraphQL service without a tool like Dataloader. In a nutshell, Dataloader is tool that keeps track of which resources have been requested and instead of making a query for each time that resource was requested, it batches those requests into one query. The batched query is similar to `select * from thing where id in [resourceIdsFromRequsts]`. While I've implemented this pattern in other languages, I'm still pretty new to Go and the recommended package (dataloaden)[https://github.com/vektah/dataloaden] is a little too opaque for me at the moment. I would love to ship  a product without N+1s, but seeing as this is a small and also a low traffic API we should be ok! 
+It's really easy to introduce a ton of N+1 queries into a GraphQL service without a tool like Dataloader. In a nutshell, Dataloader is tool that keeps track of which resources have been requested and instead of making a query for each time that resource was requested, it batches those requests into one query. The batched query is similar to `select * from thing where id in [resourceIdsFromRequsts]`. While I've implemented this pattern in other languages, I'm still pretty new to Go and the recommended package [dataloaden](https://github.com/vektah/dataloaden) is a little too opaque for me at the moment. I would love to ship  a product without N+1s, but seeing as this is a small and also a low traffic API we should be ok! 
 
 ### Tests
 
