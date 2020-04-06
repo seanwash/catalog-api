@@ -31,9 +31,6 @@ func main() {
 	port := os.Getenv("PORT")
 	dbConn := db.Connection()
 	defer dbConn.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	config := generated.Config{Resolvers: &graph.Resolver{DB: dbConn}}
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(config))
