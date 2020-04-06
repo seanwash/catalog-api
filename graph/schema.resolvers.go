@@ -403,12 +403,14 @@ func (r *queryResolver) Tracks(ctx context.Context, limit *int, offset *int, fil
 		mods = append(mods, qm.Where("to_tsvector(name) @@ to_tsquery(?)", query))
 	}
 
-	// TODO: Fix this. It's not actually filtering by a matched artist.
 	if filter != nil && filter.ArtistID != nil {
 		mods = append(mods, qm.InnerJoin("track_artists ta on ta.track_id = tracks.id"), qm.Where("ta.artist_id = ?", *filter.ArtistID))
 	}
 
-	// TODO: Add Track search by artist name
+	if filter != nil && filter.ArtistName != nil {
+		query := strings.Join(strings.Split(*filter.ArtistName, " "), " &")
+		mods = append(mods, qm.InnerJoin("track_artists ta on ta.track_id = tracks.id"), qm.InnerJoin("artists a on ta.artist_id = a.id"), qm.Where("to_tsvector(a.name) @@ to_tsquery(?)", query))
+	}
 
 	tracks, err := models.Tracks(mods...).All(ctx, r.DB)
 	if err != nil {
