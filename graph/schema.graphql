@@ -88,6 +88,7 @@ type Album {
     name: String!
     albumType: AlbumType!
     releasedAt: Time
+    tracks: [Track!]
 }
 
 "A type that describes an Genre."

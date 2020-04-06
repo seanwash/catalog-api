@@ -23,6 +23,15 @@ func (r *albumResolver) AlbumType(ctx context.Context, obj *models.Album) (gener
 	return albumType, nil
 }
 
+func (r *albumResolver) Tracks(ctx context.Context, obj *models.Album) ([]*models.Track, error) {
+	album, err := models.Albums(models.AlbumWhere.ID.EQ(obj.ID), qm.Load(models.AlbumRels.Tracks)).One(ctx, r.DB)
+	if err != nil {
+		return nil, err
+	}
+
+	return album.R.Tracks, nil
+}
+
 func (r *mutationResolver) TrackCreate(ctx context.Context, input generatedmodel.TrackInput) (*models.Track, error) {
 	if err := ensureUserIsAdmin(ctx); err != nil {
 		return nil, err
@@ -228,6 +237,12 @@ func (r *mutationResolver) AlbumCreate(ctx context.Context, input generatedmodel
 		return nil, err
 	}
 
+	err = modex.AlbumRelationshipSetops(ctx, tx, album, input)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
 	err = tx.Commit()
 	if err != nil {
 		return nil, err
@@ -257,6 +272,12 @@ func (r *mutationResolver) AlbumUpdate(ctx context.Context, id int, input genera
 	}
 
 	_, err = album.Update(ctx, tx, boil.Infer())
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = modex.AlbumRelationshipSetops(ctx, tx, album, input)
 	if err != nil {
 		tx.Rollback()
 		return nil, err

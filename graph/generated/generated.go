@@ -52,6 +52,7 @@ type ComplexityRoot struct {
 		ID         func(childComplexity int) int
 		Name       func(childComplexity int) int
 		ReleasedAt func(childComplexity int) int
+		Tracks     func(childComplexity int) int
 	}
 
 	Artist struct {
@@ -102,6 +103,8 @@ type ComplexityRoot struct {
 
 type AlbumResolver interface {
 	AlbumType(ctx context.Context, obj *models.Album) (generatedmodel.AlbumType, error)
+
+	Tracks(ctx context.Context, obj *models.Album) ([]*models.Track, error)
 }
 type MutationResolver interface {
 	TrackCreate(ctx context.Context, input generatedmodel.TrackInput) (*models.Track, error)
@@ -175,6 +178,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Album.ReleasedAt(childComplexity), true
+
+	case "Album.tracks":
+		if e.complexity.Album.Tracks == nil {
+			break
+		}
+
+		return e.complexity.Album.Tracks(childComplexity), true
 
 	case "Artist.id":
 		if e.complexity.Artist.ID == nil {
@@ -640,6 +650,7 @@ type Album {
     name: String!
     albumType: AlbumType!
     releasedAt: Time
+    tracks: [Track!]
 }
 
 "A type that describes an Genre."
@@ -1235,6 +1246,37 @@ func (ec *executionContext) _Album_releasedAt(ctx context.Context, field graphql
 	res := resTmp.(time.Time)
 	fc.Result = res
 	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Album_tracks(ctx context.Context, field graphql.CollectedField, obj *models.Album) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Album",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Album().Tracks(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.Track)
+	fc.Result = res
+	return ec.marshalOTrack2ᚕᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋmodelsᚐTrackᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Artist_id(ctx context.Context, field graphql.CollectedField, obj *models.Artist) (ret graphql.Marshaler) {
@@ -3737,6 +3779,17 @@ func (ec *executionContext) _Album(ctx context.Context, sel ast.SelectionSet, ob
 			})
 		case "releasedAt":
 			out.Values[i] = ec._Album_releasedAt(ctx, field, obj)
+		case "tracks":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Album_tracks(ctx, field, obj)
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5130,6 +5183,46 @@ func (ec *executionContext) unmarshalOTime2timeᚐTime(ctx context.Context, v in
 
 func (ec *executionContext) marshalOTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
 	return graphql.MarshalTime(v)
+}
+
+func (ec *executionContext) marshalOTrack2ᚕᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋmodelsᚐTrackᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.Track) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTrack2ᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋmodelsᚐTrack(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) unmarshalOTrackFilter2githubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐTrackFilter(ctx context.Context, v interface{}) (generatedmodel.TrackFilter, error) {

@@ -17,7 +17,6 @@ import (
 // their relationship removed.
 func TrackRelationshipSetops(ctx context.Context, tx *sql.Tx, track *models.Track, input generatedmodel.TrackInput) error {
 	artists, err := models.Artists(models.ArtistWhere.ID.IN(input.ArtistIds)).All(ctx, tx)
-
 	if err != nil {
 		return err
 	}
@@ -43,6 +42,23 @@ func TrackRelationshipSetops(ctx context.Context, tx *sql.Tx, track *models.Trac
 	}
 
 	err = track.SetGenres(ctx, tx, false, genres...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// AlbumRelationshipSetops handles adding new relationships for a given
+// Album and AlbumInput. Note that any IDs not supplied by the client will have
+// their relationship removed.
+func AlbumRelationshipSetops(ctx context.Context, tx *sql.Tx, track *models.Album, input generatedmodel.AlbumInput) error {
+	tracks, err := models.Tracks(models.TrackWhere.ID.IN(input.TrackIds)).All(ctx, tx)
+	if err != nil {
+		return err
+	}
+
+	err = track.SetTracks(ctx, tx, false, tracks...)
 	if err != nil {
 		return err
 	}
