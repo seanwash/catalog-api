@@ -24,7 +24,7 @@ Before getting started, note that Docker is configured to run Postgres exposing 
 
 To stop the containers and remove and volumes:
 
-1. Run `docker-compose down -v`
+1. Run `docker-compose down -v`.
 
 ## Using the API
 
