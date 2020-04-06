@@ -24,7 +24,15 @@ The attached Insomnia workspace will include a number of sample queries and muta
 
 One thing to note is that all mutations are protected and can be accessed by sending an `API-KEY` header along with the request. The Insomnia workspace should have this pre configured, so give the mutations a try with and without the header.
 
-Additionally, a live API is available at https://catalog-api.onrender.com. The exported Insomnia workspace contains a production environment as well as a development environment.
+### Adding / Removing Track Relations
+
+The `trackCreate` and `trackUpdate` mutations expose fields like `{relationship}_id`, e.g. `artist_ids`, `album_ids`, and `genre_ids`. To add a track to an existing album, you just need to include that album's ID in the `artist_ids` field. If you want to remove a track from an album, just omit that album's ID from the `artist_ids` field on an update. This works the same for both albums and genres. This approach can also be expanded to work with albums and artists as well, but has not been implemented.
+
+Another approach would have been to allow nested relationship objects to be sent along in a mutation. The server then either assigns a new relationship if the relation object has an ID or creates a new object and then assigns the relationship if the object doesn't have an ID. While I had originally implemented this for tracks, I decided to remove the functionality because it made the create/update mutations more complicated for the client. `{relationship}_ids` is very clear and explicit, whereas the other approach introduces multiple places for creating a single resource, thereby introducing more points of potential failure.
+
+### Live API
+
+Additionally, a live API is available at https://catalog-api.onrender.com. The exported Insomnia workspace contains a production environment as well as a development environment. This live API runs at [Render](https://render.com) and code is automatically deployed each time code is pushed to the master git branch.
 
 ## Database Design
 
