@@ -24,6 +24,8 @@ The attached Insomnia workspace will include a number of sample queries and muta
 
 One thing to note is that any mutations are protected and can be accessed by sending an `API-KEY` header along with the request. The Insomnia workspace should have this pre configured, so give the mutations a try with and without the header.
 
+Additionally, a live API is available at https://catalog-api.onrender.com. The exported Insomnia workspace contains a production environment as well as a development environment.
+
 ## Database Design
 
 It seems like these days you don't see any albums being released without multiple featured artists, and often times an album will cover the span of multiple genres. Because of this, tracks are central to the heart of this database design. 
