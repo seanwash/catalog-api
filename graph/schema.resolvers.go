@@ -44,7 +44,7 @@ func (r *mutationResolver) TrackCreate(ctx context.Context, input generatedmodel
 		return nil, err
 	}
 
-	err = modex.TrackCreateRelationshipSetops(ctx, tx, track, input)
+	err = modex.TrackRelationshipSetops(ctx, tx, track, input)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -82,7 +82,7 @@ func (r *mutationResolver) TrackUpdate(ctx context.Context, id int, input genera
 		return nil, err
 	}
 
-	err = modex.TrackUpdateRelationshipSetops(ctx, tx, track, input)
+	err = modex.TrackRelationshipSetops(ctx, tx, track, input)
 	if err != nil {
 		tx.Rollback()
 		return nil, err

@@ -14,6 +14,9 @@ type AlbumInput struct {
 	Name       string    `json:"name"`
 	ReleasedAt time.Time `json:"releasedAt"`
 	AlbumType  AlbumType `json:"albumType"`
+	TrackIds   []int     `json:"trackIds"`
+	ArtistIds  []int     `json:"artistIds"`
+	GenreIds   []int     `json:"genreIds"`
 }
 
 type ArtistInput struct {
@@ -37,12 +40,12 @@ type TrackFilter struct {
 }
 
 type TrackInput struct {
-	ID         *int           `json:"id"`
-	Name       string         `json:"name"`
-	DurationMs int            `json:"durationMS"`
-	Artists    []*ArtistInput `json:"artists"`
-	Albums     []*AlbumInput  `json:"albums"`
-	Genres     []*GenreInput  `json:"genres"`
+	ID         *int   `json:"id"`
+	Name       string `json:"name"`
+	DurationMs int    `json:"durationMS"`
+	ArtistIds  []int  `json:"artistIds"`
+	AlbumIds   []int  `json:"albumIds"`
+	GenreIds   []int  `json:"genreIds"`
 }
 
 type AlbumType string

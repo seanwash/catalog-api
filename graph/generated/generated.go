@@ -670,14 +670,9 @@ input TrackInput {
     id: ID
     name: String!
     durationMS: Int!
-    artists: [ArtistInput!]
-    albums: [AlbumInput!]
-    genres: [GenreInput!]
-}
-
-input ArtistInput {
-    id: ID
-    name: String!
+    artistIds: [ID!]
+    albumIds: [ID!]
+    genreIds: [ID!]
 }
 
 input AlbumInput {
@@ -685,6 +680,14 @@ input AlbumInput {
     name: String!
     releasedAt: Time!
     albumType: AlbumType!
+    trackIds: [ID!]
+    artistIds: [ID!]
+    genreIds: [ID!]
+}
+
+input ArtistInput {
+    id: ID
+    name: String!
 }
 
 input GenreInput {
@@ -3539,6 +3542,24 @@ func (ec *executionContext) unmarshalInputAlbumInput(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "trackIds":
+			var err error
+			it.TrackIds, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "artistIds":
+			var err error
+			it.ArtistIds, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "genreIds":
+			var err error
+			it.GenreIds, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -3647,21 +3668,21 @@ func (ec *executionContext) unmarshalInputTrackInput(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "artists":
+		case "artistIds":
 			var err error
-			it.Artists, err = ec.unmarshalOArtistInput2ᚕᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐArtistInputᚄ(ctx, v)
+			it.ArtistIds, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "albums":
+		case "albumIds":
 			var err error
-			it.Albums, err = ec.unmarshalOAlbumInput2ᚕᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumInputᚄ(ctx, v)
+			it.AlbumIds, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "genres":
+		case "genreIds":
 			var err error
-			it.Genres, err = ec.unmarshalOGenreInput2ᚕᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐGenreInputᚄ(ctx, v)
+			it.GenreIds, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4389,14 +4410,6 @@ func (ec *executionContext) unmarshalNAlbumInput2githubᚗcomᚋseanwashᚋcatal
 	return ec.unmarshalInputAlbumInput(ctx, v)
 }
 
-func (ec *executionContext) unmarshalNAlbumInput2ᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumInput(ctx context.Context, v interface{}) (*generatedmodel.AlbumInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalNAlbumInput2githubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumInput(ctx, v)
-	return &res, err
-}
-
 func (ec *executionContext) unmarshalNAlbumType2githubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumType(ctx context.Context, v interface{}) (generatedmodel.AlbumType, error) {
 	var res generatedmodel.AlbumType
 	return res, res.UnmarshalGQL(v)
@@ -4459,14 +4472,6 @@ func (ec *executionContext) marshalNArtist2ᚖgithubᚗcomᚋseanwashᚋcatalog�
 
 func (ec *executionContext) unmarshalNArtistInput2githubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐArtistInput(ctx context.Context, v interface{}) (generatedmodel.ArtistInput, error) {
 	return ec.unmarshalInputArtistInput(ctx, v)
-}
-
-func (ec *executionContext) unmarshalNArtistInput2ᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐArtistInput(ctx context.Context, v interface{}) (*generatedmodel.ArtistInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalNArtistInput2githubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐArtistInput(ctx, v)
-	return &res, err
 }
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
@@ -4536,14 +4541,6 @@ func (ec *executionContext) marshalNGenre2ᚖgithubᚗcomᚋseanwashᚋcatalog�
 
 func (ec *executionContext) unmarshalNGenreInput2githubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐGenreInput(ctx context.Context, v interface{}) (generatedmodel.GenreInput, error) {
 	return ec.unmarshalInputGenreInput(ctx, v)
-}
-
-func (ec *executionContext) unmarshalNGenreInput2ᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐGenreInput(ctx context.Context, v interface{}) (*generatedmodel.GenreInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalNGenreInput2githubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐGenreInput(ctx, v)
-	return &res, err
 }
 
 func (ec *executionContext) unmarshalNID2int(ctx context.Context, v interface{}) (int, error) {
@@ -4923,26 +4920,6 @@ func (ec *executionContext) marshalOAlbum2ᚕᚖgithubᚗcomᚋseanwashᚋcatalo
 	return ret
 }
 
-func (ec *executionContext) unmarshalOAlbumInput2ᚕᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumInputᚄ(ctx context.Context, v interface{}) ([]*generatedmodel.AlbumInput, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*generatedmodel.AlbumInput, len(vSlice))
-	for i := range vSlice {
-		res[i], err = ec.unmarshalNAlbumInput2ᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
 func (ec *executionContext) marshalOArtist2ᚕᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋmodelsᚐArtistᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.Artist) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -4981,26 +4958,6 @@ func (ec *executionContext) marshalOArtist2ᚕᚖgithubᚗcomᚋseanwashᚋcatal
 	}
 	wg.Wait()
 	return ret
-}
-
-func (ec *executionContext) unmarshalOArtistInput2ᚕᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐArtistInputᚄ(ctx context.Context, v interface{}) ([]*generatedmodel.ArtistInput, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*generatedmodel.ArtistInput, len(vSlice))
-	for i := range vSlice {
-		res[i], err = ec.unmarshalNArtistInput2ᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐArtistInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
@@ -5066,7 +5023,15 @@ func (ec *executionContext) marshalOGenre2ᚕᚖgithubᚗcomᚋseanwashᚋcatalo
 	return ret
 }
 
-func (ec *executionContext) unmarshalOGenreInput2ᚕᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐGenreInputᚄ(ctx context.Context, v interface{}) ([]*generatedmodel.GenreInput, error) {
+func (ec *executionContext) unmarshalOID2int(ctx context.Context, v interface{}) (int, error) {
+	return graphql.UnmarshalIntID(v)
+}
+
+func (ec *executionContext) marshalOID2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	return graphql.MarshalIntID(v)
+}
+
+func (ec *executionContext) unmarshalOID2ᚕintᚄ(ctx context.Context, v interface{}) ([]int, error) {
 	var vSlice []interface{}
 	if v != nil {
 		if tmp1, ok := v.([]interface{}); ok {
@@ -5076,9 +5041,9 @@ func (ec *executionContext) unmarshalOGenreInput2ᚕᚖgithubᚗcomᚋseanwash�
 		}
 	}
 	var err error
-	res := make([]*generatedmodel.GenreInput, len(vSlice))
+	res := make([]int, len(vSlice))
 	for i := range vSlice {
-		res[i], err = ec.unmarshalNGenreInput2ᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐGenreInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNID2int(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -5086,12 +5051,16 @@ func (ec *executionContext) unmarshalOGenreInput2ᚕᚖgithubᚗcomᚋseanwash�
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOID2int(ctx context.Context, v interface{}) (int, error) {
-	return graphql.UnmarshalIntID(v)
-}
+func (ec *executionContext) marshalOID2ᚕintᚄ(ctx context.Context, sel ast.SelectionSet, v []int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNID2int(ctx, sel, v[i])
+	}
 
-func (ec *executionContext) marshalOID2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
-	return graphql.MarshalIntID(v)
+	return ret
 }
 
 func (ec *executionContext) unmarshalOID2ᚖint(ctx context.Context, v interface{}) (*int, error) {

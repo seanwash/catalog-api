@@ -118,14 +118,9 @@ input TrackInput {
     id: ID
     name: String!
     durationMS: Int!
-    artists: [ArtistInput!]
-    albums: [AlbumInput!]
-    genres: [GenreInput!]
-}
-
-input ArtistInput {
-    id: ID
-    name: String!
+    artistIds: [ID!]
+    albumIds: [ID!]
+    genreIds: [ID!]
 }
 
 input AlbumInput {
@@ -133,6 +128,14 @@ input AlbumInput {
     name: String!
     releasedAt: Time!
     albumType: AlbumType!
+    trackIds: [ID!]
+    artistIds: [ID!]
+    genreIds: [ID!]
+}
+
+input ArtistInput {
+    id: ID
+    name: String!
 }
 
 input GenreInput {
