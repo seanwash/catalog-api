@@ -73,6 +73,9 @@ func (r *mutationResolver) TrackUpdate(ctx context.Context, id int, input genera
 	}
 
 	track, err := models.FindTrack(ctx, r.DB, id)
+	if track == nil {
+		return nil, gqlerror.Errorf("No Tracks found with ID %d", id)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -111,13 +114,9 @@ func (r *mutationResolver) TrackDelete(ctx context.Context, id int) (*models.Tra
 	}
 
 	track, err := models.FindTrack(ctx, r.DB, id)
-	// In most cases here, `err` will be reporting that no rows were found if
-	// an invalid `id` is given. This is just a friendlier message.
 	if track == nil {
-		return nil, gqlerror.Errorf("No Track found with ID %d", id)
+		return nil, gqlerror.Errorf("No Tracks found with ID %d", id)
 	}
-
-	// Report error in the case of a failure other than an invalid `id`.
 	if err != nil {
 		return nil, err
 	}
@@ -164,6 +163,9 @@ func (r *mutationResolver) ArtistUpdate(ctx context.Context, id int, input gener
 	}
 
 	artist, err := models.FindArtist(ctx, r.DB, id)
+	if artist == nil {
+		return nil, gqlerror.Errorf("No Artists found with ID %d", id)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -195,13 +197,9 @@ func (r *mutationResolver) ArtistDelete(ctx context.Context, id int) (*models.Ar
 	}
 
 	artist, err := models.FindArtist(ctx, r.DB, id)
-	// In most cases here, `err` will be reporting that no rows were found if
-	// an invalid `id` is given. This is just a friendlier message.
 	if artist == nil {
 		return nil, gqlerror.Errorf("No Artist found with ID %d", id)
 	}
-
-	// Report error in the case of a failure other than an invalid `id`.
 	if err != nil {
 		return nil, err
 	}
@@ -257,6 +255,9 @@ func (r *mutationResolver) AlbumUpdate(ctx context.Context, id int, input genera
 	}
 
 	album, err := models.FindAlbum(ctx, r.DB, id)
+	if album == nil {
+		return nil, gqlerror.Errorf("No Albums found with ID %d", id)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -297,10 +298,11 @@ func (r *mutationResolver) AlbumDelete(ctx context.Context, id int) (*models.Alb
 	}
 
 	album, err := models.FindAlbum(ctx, r.DB, id)
-	// In most cases here, `err` will be reporting that no rows were found if
-	// an invalid `id` is given. This is just a friendlier message.
 	if album == nil {
-		return nil, gqlerror.Errorf("No Artist found with ID %d", id)
+		return nil, gqlerror.Errorf("No Albums found with ID %d", id)
+	}
+	if err != nil {
+		return nil, err
 	}
 
 	// Report error in the case of a failure other than an invalid `id`.
@@ -350,6 +352,9 @@ func (r *mutationResolver) GenreUpdate(ctx context.Context, id int, input genera
 	}
 
 	genre, err := models.FindGenre(ctx, r.DB, id)
+	if genre == nil {
+		return nil, gqlerror.Errorf("No Genres found with ID %d", id)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -381,13 +386,9 @@ func (r *mutationResolver) GenreDelete(ctx context.Context, id int) (*models.Gen
 	}
 
 	genre, err := models.FindGenre(ctx, r.DB, id)
-	// In most cases here, `err` will be reporting that no rows were found if
-	// an invalid `id` is given. This is just a friendlier message.
 	if genre == nil {
-		return nil, gqlerror.Errorf("No Artist found with ID %d", id)
+		return nil, gqlerror.Errorf("No Genres found with ID %d", id)
 	}
-
-	// Report error in the case of a failure other than an invalid `id`.
 	if err != nil {
 		return nil, err
 	}
