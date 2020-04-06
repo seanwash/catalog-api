@@ -41,12 +41,12 @@ type Query {
     track(id: ID!): Track!
 
     "Get a list of Artists. A default limit of 25 is applied unless overridden."
-    artists(limit: Int, offset: Int): [Artist!]!
+    artists(limit: Int, offset: Int, filter: ArtistFilter): [Artist!]!
     "Get a single Artist."
     artist(id: ID!): Artist!
 
     "Get a list of Albums. A default limit of 25 is applied unless overridden."
-    albums(limit: Int, offset: Int): [Album!]!
+    albums(limit: Int, offset: Int, filter: AlbumFilter): [Album!]!
     "Get a single Album."
     album(id: ID!): Album!
 
@@ -103,12 +103,23 @@ type Genre {
 
 "Filters used for narrowing down a Track list."
 input TrackFilter {
-    "Full text search for Track name. Search string is inclusive, e.g. searching for \"Spoil my\" returns tracks with both \"spoil\" and \"my\" in the name."
+    "Find Tracks by name."
     name: String
     "Find Track s by a related Artist's ID."
     artistId: ID
-    "Find Tracks by a related Artist's Nmae."
+    "Find Tracks by a related Artist's Name."
     artistName: String
+}
+
+input ArtistFilter {
+    "Find Artists by name."
+    name: String
+}
+
+input AlbumFilter {
+    "Find Albums by name."
+    name: String
+    albumType: AlbumType
 }
 
 #
@@ -118,20 +129,24 @@ input TrackFilter {
 input TrackInput {
     id: ID
     name: String!
+    "Track duration in milliseconds."
     durationMS: Int!
+    "IDs for existing Artists that this Track belongs to."
     artistIds: [ID!]
+    "IDs for existing Albums that this Track belongs to."
     albumIds: [ID!]
+    "IDs for existing Genres that this Track has."
     genreIds: [ID!]
 }
 
 input AlbumInput {
     id: ID
     name: String!
+    "Release time and date of the album. ISO 8601 format required."
     releasedAt: Time!
     albumType: AlbumType!
+    "IDs for existing Tracks that this Album has."
     trackIds: [ID!]
-    artistIds: [ID!]
-    genreIds: [ID!]
 }
 
 input ArtistInput {

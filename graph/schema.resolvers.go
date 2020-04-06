@@ -424,12 +424,17 @@ func (r *queryResolver) Tracks(ctx context.Context, limit *int, offset *int, fil
 	}
 
 	if filter != nil && filter.ArtistID != nil {
-		mods = append(mods, qm.InnerJoin("track_artists ta on ta.track_id = tracks.id"), qm.Where("ta.artist_id = ?", *filter.ArtistID))
+		mods = append(mods,
+			qm.InnerJoin("track_artists ta on ta.track_id = tracks.id"),
+			qm.Where("ta.artist_id = ?", *filter.ArtistID))
 	}
 
 	if filter != nil && filter.ArtistName != nil {
 		query := strings.Join(strings.Split(*filter.ArtistName, " "), " &")
-		mods = append(mods, qm.InnerJoin("track_artists ta on ta.track_id = tracks.id"), qm.InnerJoin("artists a on ta.artist_id = a.id"), qm.Where("to_tsvector(a.name) @@ to_tsquery(?)", query))
+		mods = append(mods,
+			qm.InnerJoin("track_artists ta on ta.track_id = tracks.id"),
+			qm.InnerJoin("artists a on ta.artist_id = a.id"),
+			qm.Where("to_tsvector(a.name) @@ to_tsquery(?)", query))
 	}
 
 	tracks, err := models.Tracks(mods...).All(ctx, r.DB)
@@ -456,7 +461,7 @@ func (r *queryResolver) Track(ctx context.Context, id int) (*models.Track, error
 	return track, nil
 }
 
-func (r *queryResolver) Artists(ctx context.Context, limit *int, offset *int) ([]*models.Artist, error) {
+func (r *queryResolver) Artists(ctx context.Context, limit *int, offset *int, filter *generatedmodel.ArtistFilter) ([]*models.Artist, error) {
 	mods := []qm.QueryMod{
 		qm.OrderBy("created_at desc"),
 	}
@@ -470,6 +475,12 @@ func (r *queryResolver) Artists(ctx context.Context, limit *int, offset *int) ([
 
 	if offset != nil {
 		mods = append(mods, qm.Offset(*offset))
+	}
+
+	if filter != nil && filter.Name != nil {
+		// Build an inclusive search string.
+		query := strings.Join(strings.Split(*filter.Name, " "), " &")
+		mods = append(mods, qm.Where("to_tsvector(name) @@ to_tsquery(?)", query))
 	}
 
 	artists, err := models.Artists(mods...).All(ctx, r.DB)
@@ -496,7 +507,7 @@ func (r *queryResolver) Artist(ctx context.Context, id int) (*models.Artist, err
 	return artist, nil
 }
 
-func (r *queryResolver) Albums(ctx context.Context, limit *int, offset *int) ([]*models.Album, error) {
+func (r *queryResolver) Albums(ctx context.Context, limit *int, offset *int, filter *generatedmodel.AlbumFilter) ([]*models.Album, error) {
 	mods := []qm.QueryMod{
 		qm.OrderBy("created_at desc"),
 	}
@@ -509,6 +520,17 @@ func (r *queryResolver) Albums(ctx context.Context, limit *int, offset *int) ([]
 
 	if offset != nil {
 		mods = append(mods, qm.Offset(*offset))
+	}
+
+	if filter != nil && filter.Name != nil {
+		// Build an inclusive search string.
+		query := strings.Join(strings.Split(*filter.Name, " "), " &")
+		mods = append(mods, qm.Where("to_tsvector(name) @@ to_tsquery(?)", query))
+	}
+
+	if filter != nil && filter.AlbumType != nil {
+		// Postgres enums are lower case and filter.AlbumType is uppercase.
+		mods = append(mods, qm.Where("album_type = ?", strings.ToLower(filter.AlbumType.String())))
 	}
 
 	artists, err := models.Albums(mods...).All(ctx, r.DB)

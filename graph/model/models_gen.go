@@ -9,14 +9,25 @@ import (
 	"time"
 )
 
+type AlbumFilter struct {
+	// Find Albums by name.
+	Name      *string    `json:"name"`
+	AlbumType *AlbumType `json:"albumType"`
+}
+
 type AlbumInput struct {
-	ID         *int      `json:"id"`
-	Name       string    `json:"name"`
+	ID   *int   `json:"id"`
+	Name string `json:"name"`
+	// Release time and date of the album. ISO 8601 format required.
 	ReleasedAt time.Time `json:"releasedAt"`
 	AlbumType  AlbumType `json:"albumType"`
-	TrackIds   []int     `json:"trackIds"`
-	ArtistIds  []int     `json:"artistIds"`
-	GenreIds   []int     `json:"genreIds"`
+	// IDs for existing Tracks that this Album has.
+	TrackIds []int `json:"trackIds"`
+}
+
+type ArtistFilter struct {
+	// Find Artists by name.
+	Name *string `json:"name"`
 }
 
 type ArtistInput struct {
@@ -31,21 +42,25 @@ type GenreInput struct {
 
 // Filters used for narrowing down a Track list.
 type TrackFilter struct {
-	// Full text search for Track name. Search string is inclusive, e.g. searching for "Spoil my" returns tracks with both "spoil" and "my" in the name.
+	// Find Tracks by name.
 	Name *string `json:"name"`
 	// Find Track s by a related Artist's ID.
 	ArtistID *int `json:"artistId"`
-	// Find Tracks by a related Artist's Nmae.
+	// Find Tracks by a related Artist's Name.
 	ArtistName *string `json:"artistName"`
 }
 
 type TrackInput struct {
-	ID         *int   `json:"id"`
-	Name       string `json:"name"`
-	DurationMs int    `json:"durationMS"`
-	ArtistIds  []int  `json:"artistIds"`
-	AlbumIds   []int  `json:"albumIds"`
-	GenreIds   []int  `json:"genreIds"`
+	ID   *int   `json:"id"`
+	Name string `json:"name"`
+	// Track duration in milliseconds.
+	DurationMs int `json:"durationMS"`
+	// IDs for existing Artists that this Track belongs to.
+	ArtistIds []int `json:"artistIds"`
+	// IDs for existing Albums that this Track belongs to.
+	AlbumIds []int `json:"albumIds"`
+	// IDs for existing Genres that this Track has.
+	GenreIds []int `json:"genreIds"`
 }
 
 type AlbumType string

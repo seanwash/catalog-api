@@ -82,9 +82,9 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Album   func(childComplexity int, id int) int
-		Albums  func(childComplexity int, limit *int, offset *int) int
+		Albums  func(childComplexity int, limit *int, offset *int, filter *generatedmodel.AlbumFilter) int
 		Artist  func(childComplexity int, id int) int
-		Artists func(childComplexity int, limit *int, offset *int) int
+		Artists func(childComplexity int, limit *int, offset *int, filter *generatedmodel.ArtistFilter) int
 		Genre   func(childComplexity int, id int) int
 		Genres  func(childComplexity int, limit *int, offset *int) int
 		Track   func(childComplexity int, id int) int
@@ -123,9 +123,9 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Tracks(ctx context.Context, limit *int, offset *int, filter *generatedmodel.TrackFilter) ([]*models.Track, error)
 	Track(ctx context.Context, id int) (*models.Track, error)
-	Artists(ctx context.Context, limit *int, offset *int) ([]*models.Artist, error)
+	Artists(ctx context.Context, limit *int, offset *int, filter *generatedmodel.ArtistFilter) ([]*models.Artist, error)
 	Artist(ctx context.Context, id int) (*models.Artist, error)
-	Albums(ctx context.Context, limit *int, offset *int) ([]*models.Album, error)
+	Albums(ctx context.Context, limit *int, offset *int, filter *generatedmodel.AlbumFilter) ([]*models.Album, error)
 	Album(ctx context.Context, id int) (*models.Album, error)
 	Genres(ctx context.Context, limit *int, offset *int) ([]*models.Genre, error)
 	Genre(ctx context.Context, id int) (*models.Genre, error)
@@ -380,7 +380,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Albums(childComplexity, args["limit"].(*int), args["offset"].(*int)), true
+		return e.complexity.Query.Albums(childComplexity, args["limit"].(*int), args["offset"].(*int), args["filter"].(*generatedmodel.AlbumFilter)), true
 
 	case "Query.artist":
 		if e.complexity.Query.Artist == nil {
@@ -404,7 +404,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Artists(childComplexity, args["limit"].(*int), args["offset"].(*int)), true
+		return e.complexity.Query.Artists(childComplexity, args["limit"].(*int), args["offset"].(*int), args["filter"].(*generatedmodel.ArtistFilter)), true
 
 	case "Query.genre":
 		if e.complexity.Query.Genre == nil {
@@ -603,12 +603,12 @@ type Query {
     track(id: ID!): Track!
 
     "Get a list of Artists. A default limit of 25 is applied unless overridden."
-    artists(limit: Int, offset: Int): [Artist!]!
+    artists(limit: Int, offset: Int, filter: ArtistFilter): [Artist!]!
     "Get a single Artist."
     artist(id: ID!): Artist!
 
     "Get a list of Albums. A default limit of 25 is applied unless overridden."
-    albums(limit: Int, offset: Int): [Album!]!
+    albums(limit: Int, offset: Int, filter: AlbumFilter): [Album!]!
     "Get a single Album."
     album(id: ID!): Album!
 
@@ -665,12 +665,23 @@ type Genre {
 
 "Filters used for narrowing down a Track list."
 input TrackFilter {
-    "Full text search for Track name. Search string is inclusive, e.g. searching for \"Spoil my\" returns tracks with both \"spoil\" and \"my\" in the name."
+    "Find Tracks by name."
     name: String
     "Find Track s by a related Artist's ID."
     artistId: ID
-    "Find Tracks by a related Artist's Nmae."
+    "Find Tracks by a related Artist's Name."
     artistName: String
+}
+
+input ArtistFilter {
+    "Find Artists by name."
+    name: String
+}
+
+input AlbumFilter {
+    "Find Albums by name."
+    name: String
+    albumType: AlbumType
 }
 
 #
@@ -680,20 +691,24 @@ input TrackFilter {
 input TrackInput {
     id: ID
     name: String!
+    "Track duration in milliseconds."
     durationMS: Int!
+    "IDs for existing Artists that this Track belongs to."
     artistIds: [ID!]
+    "IDs for existing Albums that this Track belongs to."
     albumIds: [ID!]
+    "IDs for existing Genres that this Track has."
     genreIds: [ID!]
 }
 
 input AlbumInput {
     id: ID
     name: String!
+    "Release time and date of the album. ISO 8601 format required."
     releasedAt: Time!
     albumType: AlbumType!
+    "IDs for existing Tracks that this Album has."
     trackIds: [ID!]
-    artistIds: [ID!]
-    genreIds: [ID!]
 }
 
 input ArtistInput {
@@ -960,6 +975,14 @@ func (ec *executionContext) field_Query_albums_args(ctx context.Context, rawArgs
 		}
 	}
 	args["offset"] = arg1
+	var arg2 *generatedmodel.AlbumFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg2, err = ec.unmarshalOAlbumFilter2ᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg2
 	return args, nil
 }
 
@@ -996,6 +1019,14 @@ func (ec *executionContext) field_Query_artists_args(ctx context.Context, rawArg
 		}
 	}
 	args["offset"] = arg1
+	var arg2 *generatedmodel.ArtistFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg2, err = ec.unmarshalOArtistFilter2ᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐArtistFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg2
 	return args, nil
 }
 
@@ -2013,7 +2044,7 @@ func (ec *executionContext) _Query_artists(ctx context.Context, field graphql.Co
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Artists(rctx, args["limit"].(*int), args["offset"].(*int))
+		return ec.resolvers.Query().Artists(rctx, args["limit"].(*int), args["offset"].(*int), args["filter"].(*generatedmodel.ArtistFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2095,7 +2126,7 @@ func (ec *executionContext) _Query_albums(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Albums(rctx, args["limit"].(*int), args["offset"].(*int))
+		return ec.resolvers.Query().Albums(rctx, args["limit"].(*int), args["offset"].(*int), args["filter"].(*generatedmodel.AlbumFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3554,6 +3585,30 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAlbumFilter(ctx context.Context, obj interface{}) (generatedmodel.AlbumFilter, error) {
+	var it generatedmodel.AlbumFilter
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "albumType":
+			var err error
+			it.AlbumType, err = ec.unmarshalOAlbumType2ᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputAlbumInput(ctx context.Context, obj interface{}) (generatedmodel.AlbumInput, error) {
 	var it generatedmodel.AlbumInput
 	var asMap = obj.(map[string]interface{})
@@ -3590,15 +3645,21 @@ func (ec *executionContext) unmarshalInputAlbumInput(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "artistIds":
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputArtistFilter(ctx context.Context, obj interface{}) (generatedmodel.ArtistFilter, error) {
+	var it generatedmodel.ArtistFilter
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
 			var err error
-			it.ArtistIds, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "genreIds":
-			var err error
-			it.GenreIds, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4973,6 +5034,42 @@ func (ec *executionContext) marshalOAlbum2ᚕᚖgithubᚗcomᚋseanwashᚋcatalo
 	return ret
 }
 
+func (ec *executionContext) unmarshalOAlbumFilter2githubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumFilter(ctx context.Context, v interface{}) (generatedmodel.AlbumFilter, error) {
+	return ec.unmarshalInputAlbumFilter(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOAlbumFilter2ᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumFilter(ctx context.Context, v interface{}) (*generatedmodel.AlbumFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOAlbumFilter2githubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumFilter(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) unmarshalOAlbumType2githubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumType(ctx context.Context, v interface{}) (generatedmodel.AlbumType, error) {
+	var res generatedmodel.AlbumType
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalOAlbumType2githubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumType(ctx context.Context, sel ast.SelectionSet, v generatedmodel.AlbumType) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalOAlbumType2ᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumType(ctx context.Context, v interface{}) (*generatedmodel.AlbumType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOAlbumType2githubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumType(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOAlbumType2ᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐAlbumType(ctx context.Context, sel ast.SelectionSet, v *generatedmodel.AlbumType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
 func (ec *executionContext) marshalOArtist2ᚕᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋmodelsᚐArtistᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.Artist) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -5011,6 +5108,18 @@ func (ec *executionContext) marshalOArtist2ᚕᚖgithubᚗcomᚋseanwashᚋcatal
 	}
 	wg.Wait()
 	return ret
+}
+
+func (ec *executionContext) unmarshalOArtistFilter2githubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐArtistFilter(ctx context.Context, v interface{}) (generatedmodel.ArtistFilter, error) {
+	return ec.unmarshalInputArtistFilter(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOArtistFilter2ᚖgithubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐArtistFilter(ctx context.Context, v interface{}) (*generatedmodel.ArtistFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOArtistFilter2githubᚗcomᚋseanwashᚋcatalogᚑapiᚋgraphᚋmodelᚐArtistFilter(ctx, v)
+	return &res, err
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
