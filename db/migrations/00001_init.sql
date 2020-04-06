@@ -1,3 +1,12 @@
+-- +goose Up
+-- +goose StatementBegin
+
+--
+-- Enums
+--
+
+create type album_type as enum ('album', 'single', 'compilation');
+
 --
 -- Tables
 --
@@ -6,6 +15,7 @@ create table tracks
 (
     id   serial not null primary key,
     name text   not null,
+    duration_ms integer not null,
     created_at timestamp not null,
     updated_at timestamp not null
 );
@@ -14,6 +24,8 @@ create table albums
 (
     id   serial not null primary key,
     name text   not null,
+    album_type album_type not null,
+    released_at timestamp not null,
     created_at timestamp not null,
     updated_at timestamp not null
 );
@@ -77,3 +89,16 @@ create table track_genres
 
 create index on track_genres (track_id);
 create index on track_genres (genre_id);
+-- +goose StatementEnd
+
+-- +goose Down
+drop index if exists artists_lower_case_name_index;
+drop index if exists genres_lower_case_name_index;
+drop table if exists track_artists;
+drop table if exists track_albums;
+drop table if exists track_genres;
+drop table if exists tracks;
+drop table if exists albums;
+drop table if exists artists;
+drop table if exists genres;
+drop type if exists album_type;

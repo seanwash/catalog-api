@@ -81,13 +81,6 @@ func TestCount(t *testing.T) {
 	t.Run("Tracks", testTracksCount)
 }
 
-func TestHooks(t *testing.T) {
-	t.Run("Albums", testAlbumsHooks)
-	t.Run("Artists", testArtistsHooks)
-	t.Run("Genres", testGenresHooks)
-	t.Run("Tracks", testTracksHooks)
-}
-
 func TestInsert(t *testing.T) {
 	t.Run("Albums", testAlbumsInsert)
 	t.Run("Albums", testAlbumsInsertWhitelist)

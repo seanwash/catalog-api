@@ -23,29 +23,44 @@ import (
 
 // Track is an object representing the database table.
 type Track struct {
-	ID   int    `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name string `boil:"name" json:"name" toml:"name" yaml:"name"`
+	ID         int       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name       string    `boil:"name" json:"name" toml:"name" yaml:"name"`
+	DurationMS int       `boil:"duration_ms" json:"duration_ms" toml:"duration_ms" yaml:"duration_ms"`
+	CreatedAt  time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt  time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *trackR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L trackL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var TrackColumns = struct {
-	ID   string
-	Name string
+	ID         string
+	Name       string
+	DurationMS string
+	CreatedAt  string
+	UpdatedAt  string
 }{
-	ID:   "id",
-	Name: "name",
+	ID:         "id",
+	Name:       "name",
+	DurationMS: "duration_ms",
+	CreatedAt:  "created_at",
+	UpdatedAt:  "updated_at",
 }
 
 // Generated where
 
 var TrackWhere = struct {
-	ID   whereHelperint
-	Name whereHelperstring
+	ID         whereHelperint
+	Name       whereHelperstring
+	DurationMS whereHelperint
+	CreatedAt  whereHelpertime_Time
+	UpdatedAt  whereHelpertime_Time
 }{
-	ID:   whereHelperint{field: "\"tracks\".\"id\""},
-	Name: whereHelperstring{field: "\"tracks\".\"name\""},
+	ID:         whereHelperint{field: "\"tracks\".\"id\""},
+	Name:       whereHelperstring{field: "\"tracks\".\"name\""},
+	DurationMS: whereHelperint{field: "\"tracks\".\"duration_ms\""},
+	CreatedAt:  whereHelpertime_Time{field: "\"tracks\".\"created_at\""},
+	UpdatedAt:  whereHelpertime_Time{field: "\"tracks\".\"updated_at\""},
 }
 
 // TrackRels is where relationship names are stored.
@@ -75,8 +90,8 @@ func (*trackR) NewStruct() *trackR {
 type trackL struct{}
 
 var (
-	trackAllColumns            = []string{"id", "name"}
-	trackColumnsWithoutDefault = []string{"name"}
+	trackAllColumns            = []string{"id", "name", "duration_ms", "created_at", "updated_at"}
+	trackColumnsWithoutDefault = []string{"name", "duration_ms", "created_at", "updated_at"}
 	trackColumnsWithDefault    = []string{"id"}
 	trackPrimaryKeyColumns     = []string{"id"}
 )
@@ -85,8 +100,6 @@ type (
 	// TrackSlice is an alias for a slice of pointers to Track.
 	// This should generally be used opposed to []Track.
 	TrackSlice []*Track
-	// TrackHook is the signature for custom Track hook methods
-	TrackHook func(context.Context, boil.ContextExecutor, *Track) error
 
 	trackQuery struct {
 		*queries.Query
@@ -114,176 +127,6 @@ var (
 	_ = qmhelper.Where
 )
 
-var trackBeforeInsertHooks []TrackHook
-var trackBeforeUpdateHooks []TrackHook
-var trackBeforeDeleteHooks []TrackHook
-var trackBeforeUpsertHooks []TrackHook
-
-var trackAfterInsertHooks []TrackHook
-var trackAfterSelectHooks []TrackHook
-var trackAfterUpdateHooks []TrackHook
-var trackAfterDeleteHooks []TrackHook
-var trackAfterUpsertHooks []TrackHook
-
-// doBeforeInsertHooks executes all "before insert" hooks.
-func (o *Track) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range trackBeforeInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *Track) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range trackBeforeUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *Track) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range trackBeforeDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *Track) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range trackBeforeUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterInsertHooks executes all "after Insert" hooks.
-func (o *Track) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range trackAfterInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterSelectHooks executes all "after Select" hooks.
-func (o *Track) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range trackAfterSelectHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpdateHooks executes all "after Update" hooks.
-func (o *Track) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range trackAfterUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *Track) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range trackAfterDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *Track) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range trackAfterUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// AddTrackHook registers your hook function for all future operations.
-func AddTrackHook(hookPoint boil.HookPoint, trackHook TrackHook) {
-	switch hookPoint {
-	case boil.BeforeInsertHook:
-		trackBeforeInsertHooks = append(trackBeforeInsertHooks, trackHook)
-	case boil.BeforeUpdateHook:
-		trackBeforeUpdateHooks = append(trackBeforeUpdateHooks, trackHook)
-	case boil.BeforeDeleteHook:
-		trackBeforeDeleteHooks = append(trackBeforeDeleteHooks, trackHook)
-	case boil.BeforeUpsertHook:
-		trackBeforeUpsertHooks = append(trackBeforeUpsertHooks, trackHook)
-	case boil.AfterInsertHook:
-		trackAfterInsertHooks = append(trackAfterInsertHooks, trackHook)
-	case boil.AfterSelectHook:
-		trackAfterSelectHooks = append(trackAfterSelectHooks, trackHook)
-	case boil.AfterUpdateHook:
-		trackAfterUpdateHooks = append(trackAfterUpdateHooks, trackHook)
-	case boil.AfterDeleteHook:
-		trackAfterDeleteHooks = append(trackAfterDeleteHooks, trackHook)
-	case boil.AfterUpsertHook:
-		trackAfterUpsertHooks = append(trackAfterUpsertHooks, trackHook)
-	}
-}
-
 // One returns a single track record from the query.
 func (q trackQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Track, error) {
 	o := &Track{}
@@ -298,10 +141,6 @@ func (q trackQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Track,
 		return nil, errors.Wrap(err, "models: failed to execute a one query for tracks")
 	}
 
-	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
-		return o, err
-	}
-
 	return o, nil
 }
 
@@ -312,14 +151,6 @@ func (q trackQuery) All(ctx context.Context, exec boil.ContextExecutor) (TrackSl
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to Track slice")
-	}
-
-	if len(trackAfterSelectHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
-				return o, err
-			}
-		}
 	}
 
 	return o, nil
@@ -483,7 +314,7 @@ func (trackL) LoadAlbums(ctx context.Context, e boil.ContextExecutor, singular b
 		one := new(Album)
 		var localJoinCol int
 
-		err = results.Scan(&one.ID, &one.Name, &localJoinCol)
+		err = results.Scan(&one.ID, &one.Name, &one.AlbumType, &one.ReleasedAt, &one.CreatedAt, &one.UpdatedAt, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for albums")
 		}
@@ -502,13 +333,6 @@ func (trackL) LoadAlbums(ctx context.Context, e boil.ContextExecutor, singular b
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for albums")
 	}
 
-	if len(albumAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
 	if singular {
 		object.R.Albums = resultSlice
 		for _, foreign := range resultSlice {
@@ -598,7 +422,7 @@ func (trackL) LoadArtists(ctx context.Context, e boil.ContextExecutor, singular 
 		one := new(Artist)
 		var localJoinCol int
 
-		err = results.Scan(&one.ID, &one.Name, &localJoinCol)
+		err = results.Scan(&one.ID, &one.Name, &one.CreatedAt, &one.UpdatedAt, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for artists")
 		}
@@ -617,13 +441,6 @@ func (trackL) LoadArtists(ctx context.Context, e boil.ContextExecutor, singular 
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for artists")
 	}
 
-	if len(artistAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
 	if singular {
 		object.R.Artists = resultSlice
 		for _, foreign := range resultSlice {
@@ -713,7 +530,7 @@ func (trackL) LoadGenres(ctx context.Context, e boil.ContextExecutor, singular b
 		one := new(Genre)
 		var localJoinCol int
 
-		err = results.Scan(&one.ID, &one.Name, &localJoinCol)
+		err = results.Scan(&one.ID, &one.Name, &one.CreatedAt, &one.UpdatedAt, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for genres")
 		}
@@ -732,13 +549,6 @@ func (trackL) LoadGenres(ctx context.Context, e boil.ContextExecutor, singular b
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for genres")
 	}
 
-	if len(genreAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
 	if singular {
 		object.R.Genres = resultSlice
 		for _, foreign := range resultSlice {
@@ -1227,9 +1037,15 @@ func (o *Track) Insert(ctx context.Context, exec boil.ContextExecutor, columns b
 	}
 
 	var err error
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
 
-	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
-		return err
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
+		}
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(trackColumnsWithDefault, o)
@@ -1295,17 +1111,20 @@ func (o *Track) Insert(ctx context.Context, exec boil.ContextExecutor, columns b
 		trackInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(ctx, exec)
+	return nil
 }
 
 // Update uses an executor to update the Track.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *Track) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
-	var err error
-	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
-		return 0, err
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		o.UpdatedAt = currTime
 	}
+
+	var err error
 	key := makeCacheKey(columns, nil)
 	trackUpdateCacheMut.RLock()
 	cache, cached := trackUpdateCache[key]
@@ -1358,7 +1177,7 @@ func (o *Track) Update(ctx context.Context, exec boil.ContextExecutor, columns b
 		trackUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
+	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values.
@@ -1432,9 +1251,13 @@ func (o *Track) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnC
 	if o == nil {
 		return errors.New("models: no tracks provided for upsert")
 	}
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
 
-	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
-		return err
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(trackColumnsWithDefault, o)
@@ -1538,7 +1361,7 @@ func (o *Track) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnC
 		trackUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(ctx, exec)
+	return nil
 }
 
 // Delete deletes a single Track record with an executor.
@@ -1546,10 +1369,6 @@ func (o *Track) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnC
 func (o *Track) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no Track provided for delete")
-	}
-
-	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), trackPrimaryKeyMapping)
@@ -1568,10 +1387,6 @@ func (o *Track) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, e
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for tracks")
-	}
-
-	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	return rowsAff, nil
@@ -1604,14 +1419,6 @@ func (o TrackSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (i
 		return 0, nil
 	}
 
-	if len(trackBeforeDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
-	}
-
 	var args []interface{}
 	for _, obj := range o {
 		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), trackPrimaryKeyMapping)
@@ -1634,14 +1441,6 @@ func (o TrackSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (i
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for tracks")
-	}
-
-	if len(trackAfterDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
 	}
 
 	return rowsAff, nil

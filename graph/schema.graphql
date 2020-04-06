@@ -1,0 +1,141 @@
+#
+# Scalars
+#
+scalar Time
+
+#
+# Schema
+#
+
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+#
+# Root Types
+#
+
+type Mutation {
+    trackCreate(input: TrackInput!): Track!
+    trackUpdate(id: ID!, input: TrackInput!): Track!
+    trackDelete(id: ID!): Track!
+
+    artistCreate(input: ArtistInput!): Artist!
+    artistUpdate(id: ID!, input: ArtistInput!): Artist!
+    artistDelete(id: ID!): Artist!
+
+    albumCreate(input: AlbumInput!): Album!
+    albumUpdate(id: ID!, input: AlbumInput!): Album!
+    albumDelete(id: ID!): Album!
+
+    genreCreate(input: GenreInput!): Genre!
+    genreUpdate(id: ID!, input: GenreInput!): Genre!
+    genreDelete(id: ID!): Genre!
+}
+
+type Query {
+    "Get a list of Tracks. A default limit of 25 is applied unless overridden."
+    tracks(limit: Int, offset: Int, filter: TrackFilter): [Track!]!
+    "Get a single Track."
+    track(id: ID!): Track!
+
+    "Get a list of Artists. A default limit of 25 is applied unless overridden."
+    artists(limit: Int, offset: Int): [Artist!]!
+    "Get a single Artist."
+    artist(id: ID!): Artist!
+
+    "Get a list of Albums. A default limit of 25 is applied unless overridden."
+    albums(limit: Int, offset: Int): [Album!]!
+    "Get a single Album."
+    album(id: ID!): Album!
+
+    "Get a list of Genres. A default limit of 25 is applied unless overridden."
+    genres(limit: Int, offset: Int): [Genre!]!
+    "Get a single Genre."
+    genre(id: ID!): Genre!
+}
+
+#
+# Resource Types
+#
+
+"A type that describes a Track."
+type Track {
+    id: ID!
+    name: String!
+    durationMs: Int!
+    artists: [Artist!]
+    albums: [Album!]
+    genres: [Genre!]
+}
+
+"A type that describes an Artist."
+type Artist {
+    id: ID!
+    name: String!
+}
+
+enum AlbumType {
+    ALBUM
+    SINGLE
+    COMPILATION
+}
+
+"A type that describes an Album."
+type Album {
+    id: ID!
+    name: String!
+    albumType: AlbumType!
+    releasedAt: Time
+}
+
+"A type that describes an Genre."
+type Genre {
+    id: ID!
+    name: String!
+}
+
+#
+# Filter Inputs
+#
+
+"Filters used for narrowing down a Track list."
+input TrackFilter {
+    "Full text search for Track name. Search string is inclusive, e.g. searching for \"Spoil my\" returns tracks with both \"spoil\" and \"my\" in the name."
+    name: String
+    "Find Track s by a related Artist's ID."
+    artistId: ID
+    "Find Tracks by a related Artist's Nmae."
+    artistName: String
+}
+
+#
+# Mutation Inputs
+#
+
+input TrackInput {
+    id: ID
+    name: String!
+    durationMS: Int!
+    artists: [ArtistInput!]
+    albums: [AlbumInput!]
+    genres: [GenreInput!]
+}
+
+input ArtistInput {
+    id: ID
+    name: String!
+}
+
+input AlbumInput {
+    id: ID
+    name: String!
+    releasedAt: Time!
+    albumType: AlbumType!
+}
+
+input GenreInput {
+    id: ID
+    name: String!
+}

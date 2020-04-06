@@ -1,9 +1,0 @@
-drop index if exists artists_lower_case_name_index;
-drop index if exists genres_lower_case_name_index;
-drop table if exists track_artists;
-drop table if exists track_albums;
-drop table if exists track_genres;
-drop table if exists tracks;
-drop table if exists albums;
-drop table if exists artists;
-drop table if exists genres;

@@ -50,3 +50,10 @@ func makeCacheKey(cols boil.Columns, nzDefaults []string) string {
 	strmangle.PutBuffer(buf)
 	return str
 }
+
+// Enum values for album_type
+const (
+	AlbumTypeAlbum       = "album"
+	AlbumTypeSingle      = "single"
+	AlbumTypeCompilation = "compilation"
+)

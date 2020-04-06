@@ -23,19 +23,31 @@ import (
 
 // Album is an object representing the database table.
 type Album struct {
-	ID   int    `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name string `boil:"name" json:"name" toml:"name" yaml:"name"`
+	ID         int       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name       string    `boil:"name" json:"name" toml:"name" yaml:"name"`
+	AlbumType  string    `boil:"album_type" json:"album_type" toml:"album_type" yaml:"album_type"`
+	ReleasedAt time.Time `boil:"released_at" json:"released_at" toml:"released_at" yaml:"released_at"`
+	CreatedAt  time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt  time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *albumR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L albumL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var AlbumColumns = struct {
-	ID   string
-	Name string
+	ID         string
+	Name       string
+	AlbumType  string
+	ReleasedAt string
+	CreatedAt  string
+	UpdatedAt  string
 }{
-	ID:   "id",
-	Name: "name",
+	ID:         "id",
+	Name:       "name",
+	AlbumType:  "album_type",
+	ReleasedAt: "released_at",
+	CreatedAt:  "created_at",
+	UpdatedAt:  "updated_at",
 }
 
 // Generated where
@@ -72,12 +84,41 @@ func (w whereHelperstring) IN(slice []string) qm.QueryMod {
 	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
 }
 
+type whereHelpertime_Time struct{ field string }
+
+func (w whereHelpertime_Time) EQ(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.EQ, x)
+}
+func (w whereHelpertime_Time) NEQ(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.NEQ, x)
+}
+func (w whereHelpertime_Time) LT(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpertime_Time) LTE(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpertime_Time) GT(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
 var AlbumWhere = struct {
-	ID   whereHelperint
-	Name whereHelperstring
+	ID         whereHelperint
+	Name       whereHelperstring
+	AlbumType  whereHelperstring
+	ReleasedAt whereHelpertime_Time
+	CreatedAt  whereHelpertime_Time
+	UpdatedAt  whereHelpertime_Time
 }{
-	ID:   whereHelperint{field: "\"albums\".\"id\""},
-	Name: whereHelperstring{field: "\"albums\".\"name\""},
+	ID:         whereHelperint{field: "\"albums\".\"id\""},
+	Name:       whereHelperstring{field: "\"albums\".\"name\""},
+	AlbumType:  whereHelperstring{field: "\"albums\".\"album_type\""},
+	ReleasedAt: whereHelpertime_Time{field: "\"albums\".\"released_at\""},
+	CreatedAt:  whereHelpertime_Time{field: "\"albums\".\"created_at\""},
+	UpdatedAt:  whereHelpertime_Time{field: "\"albums\".\"updated_at\""},
 }
 
 // AlbumRels is where relationship names are stored.
@@ -101,8 +142,8 @@ func (*albumR) NewStruct() *albumR {
 type albumL struct{}
 
 var (
-	albumAllColumns            = []string{"id", "name"}
-	albumColumnsWithoutDefault = []string{"name"}
+	albumAllColumns            = []string{"id", "name", "album_type", "released_at", "created_at", "updated_at"}
+	albumColumnsWithoutDefault = []string{"name", "album_type", "released_at", "created_at", "updated_at"}
 	albumColumnsWithDefault    = []string{"id"}
 	albumPrimaryKeyColumns     = []string{"id"}
 )
@@ -111,8 +152,6 @@ type (
 	// AlbumSlice is an alias for a slice of pointers to Album.
 	// This should generally be used opposed to []Album.
 	AlbumSlice []*Album
-	// AlbumHook is the signature for custom Album hook methods
-	AlbumHook func(context.Context, boil.ContextExecutor, *Album) error
 
 	albumQuery struct {
 		*queries.Query
@@ -140,176 +179,6 @@ var (
 	_ = qmhelper.Where
 )
 
-var albumBeforeInsertHooks []AlbumHook
-var albumBeforeUpdateHooks []AlbumHook
-var albumBeforeDeleteHooks []AlbumHook
-var albumBeforeUpsertHooks []AlbumHook
-
-var albumAfterInsertHooks []AlbumHook
-var albumAfterSelectHooks []AlbumHook
-var albumAfterUpdateHooks []AlbumHook
-var albumAfterDeleteHooks []AlbumHook
-var albumAfterUpsertHooks []AlbumHook
-
-// doBeforeInsertHooks executes all "before insert" hooks.
-func (o *Album) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range albumBeforeInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *Album) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range albumBeforeUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *Album) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range albumBeforeDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *Album) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range albumBeforeUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterInsertHooks executes all "after Insert" hooks.
-func (o *Album) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range albumAfterInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterSelectHooks executes all "after Select" hooks.
-func (o *Album) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range albumAfterSelectHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpdateHooks executes all "after Update" hooks.
-func (o *Album) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range albumAfterUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *Album) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range albumAfterDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *Album) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range albumAfterUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// AddAlbumHook registers your hook function for all future operations.
-func AddAlbumHook(hookPoint boil.HookPoint, albumHook AlbumHook) {
-	switch hookPoint {
-	case boil.BeforeInsertHook:
-		albumBeforeInsertHooks = append(albumBeforeInsertHooks, albumHook)
-	case boil.BeforeUpdateHook:
-		albumBeforeUpdateHooks = append(albumBeforeUpdateHooks, albumHook)
-	case boil.BeforeDeleteHook:
-		albumBeforeDeleteHooks = append(albumBeforeDeleteHooks, albumHook)
-	case boil.BeforeUpsertHook:
-		albumBeforeUpsertHooks = append(albumBeforeUpsertHooks, albumHook)
-	case boil.AfterInsertHook:
-		albumAfterInsertHooks = append(albumAfterInsertHooks, albumHook)
-	case boil.AfterSelectHook:
-		albumAfterSelectHooks = append(albumAfterSelectHooks, albumHook)
-	case boil.AfterUpdateHook:
-		albumAfterUpdateHooks = append(albumAfterUpdateHooks, albumHook)
-	case boil.AfterDeleteHook:
-		albumAfterDeleteHooks = append(albumAfterDeleteHooks, albumHook)
-	case boil.AfterUpsertHook:
-		albumAfterUpsertHooks = append(albumAfterUpsertHooks, albumHook)
-	}
-}
-
 // One returns a single album record from the query.
 func (q albumQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Album, error) {
 	o := &Album{}
@@ -324,10 +193,6 @@ func (q albumQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Album,
 		return nil, errors.Wrap(err, "models: failed to execute a one query for albums")
 	}
 
-	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
-		return o, err
-	}
-
 	return o, nil
 }
 
@@ -338,14 +203,6 @@ func (q albumQuery) All(ctx context.Context, exec boil.ContextExecutor) (AlbumSl
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to Album slice")
-	}
-
-	if len(albumAfterSelectHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
-				return o, err
-			}
-		}
 	}
 
 	return o, nil
@@ -465,7 +322,7 @@ func (albumL) LoadTracks(ctx context.Context, e boil.ContextExecutor, singular b
 		one := new(Track)
 		var localJoinCol int
 
-		err = results.Scan(&one.ID, &one.Name, &localJoinCol)
+		err = results.Scan(&one.ID, &one.Name, &one.DurationMS, &one.CreatedAt, &one.UpdatedAt, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for tracks")
 		}
@@ -484,13 +341,6 @@ func (albumL) LoadTracks(ctx context.Context, e boil.ContextExecutor, singular b
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for tracks")
 	}
 
-	if len(trackAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
 	if singular {
 		object.R.Tracks = resultSlice
 		for _, foreign := range resultSlice {
@@ -699,9 +549,15 @@ func (o *Album) Insert(ctx context.Context, exec boil.ContextExecutor, columns b
 	}
 
 	var err error
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
 
-	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
-		return err
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
+		}
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(albumColumnsWithDefault, o)
@@ -767,17 +623,20 @@ func (o *Album) Insert(ctx context.Context, exec boil.ContextExecutor, columns b
 		albumInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(ctx, exec)
+	return nil
 }
 
 // Update uses an executor to update the Album.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *Album) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
-	var err error
-	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
-		return 0, err
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		o.UpdatedAt = currTime
 	}
+
+	var err error
 	key := makeCacheKey(columns, nil)
 	albumUpdateCacheMut.RLock()
 	cache, cached := albumUpdateCache[key]
@@ -830,7 +689,7 @@ func (o *Album) Update(ctx context.Context, exec boil.ContextExecutor, columns b
 		albumUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
+	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values.
@@ -904,9 +763,13 @@ func (o *Album) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnC
 	if o == nil {
 		return errors.New("models: no albums provided for upsert")
 	}
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
 
-	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
-		return err
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(albumColumnsWithDefault, o)
@@ -1010,7 +873,7 @@ func (o *Album) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnC
 		albumUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(ctx, exec)
+	return nil
 }
 
 // Delete deletes a single Album record with an executor.
@@ -1018,10 +881,6 @@ func (o *Album) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnC
 func (o *Album) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no Album provided for delete")
-	}
-
-	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), albumPrimaryKeyMapping)
@@ -1040,10 +899,6 @@ func (o *Album) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, e
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for albums")
-	}
-
-	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	return rowsAff, nil
@@ -1076,14 +931,6 @@ func (o AlbumSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (i
 		return 0, nil
 	}
 
-	if len(albumBeforeDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
-	}
-
 	var args []interface{}
 	for _, obj := range o {
 		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), albumPrimaryKeyMapping)
@@ -1106,14 +953,6 @@ func (o AlbumSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (i
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for albums")
-	}
-
-	if len(albumAfterDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
 	}
 
 	return rowsAff, nil

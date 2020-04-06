@@ -23,29 +23,39 @@ import (
 
 // Genre is an object representing the database table.
 type Genre struct {
-	ID   int    `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name string `boil:"name" json:"name" toml:"name" yaml:"name"`
+	ID        int       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name      string    `boil:"name" json:"name" toml:"name" yaml:"name"`
+	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *genreR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L genreL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var GenreColumns = struct {
-	ID   string
-	Name string
+	ID        string
+	Name      string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:   "id",
-	Name: "name",
+	ID:        "id",
+	Name:      "name",
+	CreatedAt: "created_at",
+	UpdatedAt: "updated_at",
 }
 
 // Generated where
 
 var GenreWhere = struct {
-	ID   whereHelperint
-	Name whereHelperstring
+	ID        whereHelperint
+	Name      whereHelperstring
+	CreatedAt whereHelpertime_Time
+	UpdatedAt whereHelpertime_Time
 }{
-	ID:   whereHelperint{field: "\"genres\".\"id\""},
-	Name: whereHelperstring{field: "\"genres\".\"name\""},
+	ID:        whereHelperint{field: "\"genres\".\"id\""},
+	Name:      whereHelperstring{field: "\"genres\".\"name\""},
+	CreatedAt: whereHelpertime_Time{field: "\"genres\".\"created_at\""},
+	UpdatedAt: whereHelpertime_Time{field: "\"genres\".\"updated_at\""},
 }
 
 // GenreRels is where relationship names are stored.
@@ -69,8 +79,8 @@ func (*genreR) NewStruct() *genreR {
 type genreL struct{}
 
 var (
-	genreAllColumns            = []string{"id", "name"}
-	genreColumnsWithoutDefault = []string{"name"}
+	genreAllColumns            = []string{"id", "name", "created_at", "updated_at"}
+	genreColumnsWithoutDefault = []string{"name", "created_at", "updated_at"}
 	genreColumnsWithDefault    = []string{"id"}
 	genrePrimaryKeyColumns     = []string{"id"}
 )
@@ -79,8 +89,6 @@ type (
 	// GenreSlice is an alias for a slice of pointers to Genre.
 	// This should generally be used opposed to []Genre.
 	GenreSlice []*Genre
-	// GenreHook is the signature for custom Genre hook methods
-	GenreHook func(context.Context, boil.ContextExecutor, *Genre) error
 
 	genreQuery struct {
 		*queries.Query
@@ -108,176 +116,6 @@ var (
 	_ = qmhelper.Where
 )
 
-var genreBeforeInsertHooks []GenreHook
-var genreBeforeUpdateHooks []GenreHook
-var genreBeforeDeleteHooks []GenreHook
-var genreBeforeUpsertHooks []GenreHook
-
-var genreAfterInsertHooks []GenreHook
-var genreAfterSelectHooks []GenreHook
-var genreAfterUpdateHooks []GenreHook
-var genreAfterDeleteHooks []GenreHook
-var genreAfterUpsertHooks []GenreHook
-
-// doBeforeInsertHooks executes all "before insert" hooks.
-func (o *Genre) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range genreBeforeInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *Genre) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range genreBeforeUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *Genre) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range genreBeforeDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *Genre) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range genreBeforeUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterInsertHooks executes all "after Insert" hooks.
-func (o *Genre) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range genreAfterInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterSelectHooks executes all "after Select" hooks.
-func (o *Genre) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range genreAfterSelectHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpdateHooks executes all "after Update" hooks.
-func (o *Genre) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range genreAfterUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *Genre) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range genreAfterDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *Genre) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range genreAfterUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// AddGenreHook registers your hook function for all future operations.
-func AddGenreHook(hookPoint boil.HookPoint, genreHook GenreHook) {
-	switch hookPoint {
-	case boil.BeforeInsertHook:
-		genreBeforeInsertHooks = append(genreBeforeInsertHooks, genreHook)
-	case boil.BeforeUpdateHook:
-		genreBeforeUpdateHooks = append(genreBeforeUpdateHooks, genreHook)
-	case boil.BeforeDeleteHook:
-		genreBeforeDeleteHooks = append(genreBeforeDeleteHooks, genreHook)
-	case boil.BeforeUpsertHook:
-		genreBeforeUpsertHooks = append(genreBeforeUpsertHooks, genreHook)
-	case boil.AfterInsertHook:
-		genreAfterInsertHooks = append(genreAfterInsertHooks, genreHook)
-	case boil.AfterSelectHook:
-		genreAfterSelectHooks = append(genreAfterSelectHooks, genreHook)
-	case boil.AfterUpdateHook:
-		genreAfterUpdateHooks = append(genreAfterUpdateHooks, genreHook)
-	case boil.AfterDeleteHook:
-		genreAfterDeleteHooks = append(genreAfterDeleteHooks, genreHook)
-	case boil.AfterUpsertHook:
-		genreAfterUpsertHooks = append(genreAfterUpsertHooks, genreHook)
-	}
-}
-
 // One returns a single genre record from the query.
 func (q genreQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Genre, error) {
 	o := &Genre{}
@@ -292,10 +130,6 @@ func (q genreQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Genre,
 		return nil, errors.Wrap(err, "models: failed to execute a one query for genres")
 	}
 
-	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
-		return o, err
-	}
-
 	return o, nil
 }
 
@@ -306,14 +140,6 @@ func (q genreQuery) All(ctx context.Context, exec boil.ContextExecutor) (GenreSl
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to Genre slice")
-	}
-
-	if len(genreAfterSelectHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
-				return o, err
-			}
-		}
 	}
 
 	return o, nil
@@ -433,7 +259,7 @@ func (genreL) LoadTracks(ctx context.Context, e boil.ContextExecutor, singular b
 		one := new(Track)
 		var localJoinCol int
 
-		err = results.Scan(&one.ID, &one.Name, &localJoinCol)
+		err = results.Scan(&one.ID, &one.Name, &one.DurationMS, &one.CreatedAt, &one.UpdatedAt, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for tracks")
 		}
@@ -452,13 +278,6 @@ func (genreL) LoadTracks(ctx context.Context, e boil.ContextExecutor, singular b
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for tracks")
 	}
 
-	if len(trackAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
 	if singular {
 		object.R.Tracks = resultSlice
 		for _, foreign := range resultSlice {
@@ -667,9 +486,15 @@ func (o *Genre) Insert(ctx context.Context, exec boil.ContextExecutor, columns b
 	}
 
 	var err error
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
 
-	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
-		return err
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
+		}
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(genreColumnsWithDefault, o)
@@ -735,17 +560,20 @@ func (o *Genre) Insert(ctx context.Context, exec boil.ContextExecutor, columns b
 		genreInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(ctx, exec)
+	return nil
 }
 
 // Update uses an executor to update the Genre.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *Genre) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
-	var err error
-	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
-		return 0, err
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		o.UpdatedAt = currTime
 	}
+
+	var err error
 	key := makeCacheKey(columns, nil)
 	genreUpdateCacheMut.RLock()
 	cache, cached := genreUpdateCache[key]
@@ -798,7 +626,7 @@ func (o *Genre) Update(ctx context.Context, exec boil.ContextExecutor, columns b
 		genreUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
+	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values.
@@ -872,9 +700,13 @@ func (o *Genre) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnC
 	if o == nil {
 		return errors.New("models: no genres provided for upsert")
 	}
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
 
-	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
-		return err
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(genreColumnsWithDefault, o)
@@ -978,7 +810,7 @@ func (o *Genre) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnC
 		genreUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(ctx, exec)
+	return nil
 }
 
 // Delete deletes a single Genre record with an executor.
@@ -986,10 +818,6 @@ func (o *Genre) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnC
 func (o *Genre) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no Genre provided for delete")
-	}
-
-	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), genrePrimaryKeyMapping)
@@ -1008,10 +836,6 @@ func (o *Genre) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, e
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for genres")
-	}
-
-	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	return rowsAff, nil
@@ -1044,14 +868,6 @@ func (o GenreSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (i
 		return 0, nil
 	}
 
-	if len(genreBeforeDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
-	}
-
 	var args []interface{}
 	for _, obj := range o {
 		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), genrePrimaryKeyMapping)
@@ -1074,14 +890,6 @@ func (o GenreSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (i
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for genres")
-	}
-
-	if len(genreAfterDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
 	}
 
 	return rowsAff, nil

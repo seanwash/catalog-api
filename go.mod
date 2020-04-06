@@ -3,26 +3,36 @@ module github.com/seanwash/catalog-api
 go 1.14
 
 require (
+	github.com/99designs/gqlgen v0.11.3
 	github.com/DATA-DOG/go-sqlmock v1.4.1 // indirect
 	github.com/friendsofgo/errors v0.9.2
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-chi/chi v4.1.0+incompatible
-	github.com/go-chi/render v1.0.1
+	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
+	github.com/golang-migrate/migrate v3.5.4+incompatible // indirect
+	github.com/golang-migrate/migrate/v4 v4.10.0 // indirect
+	github.com/hashicorp/golang-lru v0.5.1 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
 	github.com/lib/pq v1.3.0
+	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/pelletier/go-toml v1.6.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pressly/goose v2.6.0+incompatible
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/testify v1.5.1 // indirect
+	github.com/vektah/dataloaden v0.2.1-0.20190515034641-a19b9a6e7c9e
+	github.com/vektah/gqlparser/v2 v2.0.1
 	github.com/volatiletech/inflect v0.0.0-20170731032912-e7201282ae8d // indirect
 	github.com/volatiletech/null v8.0.0+incompatible // indirect
 	github.com/volatiletech/sqlboiler v3.7.0+incompatible
+	github.com/ziutek/mymysql v1.5.4 // indirect
 	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
 	golang.org/x/sys v0.0.0-20200331124033-c3d80250170d // indirect
 	golang.org/x/text v0.3.2 // indirect

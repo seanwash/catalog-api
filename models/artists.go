@@ -23,29 +23,39 @@ import (
 
 // Artist is an object representing the database table.
 type Artist struct {
-	ID   int    `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name string `boil:"name" json:"name" toml:"name" yaml:"name"`
+	ID        int       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name      string    `boil:"name" json:"name" toml:"name" yaml:"name"`
+	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *artistR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L artistL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var ArtistColumns = struct {
-	ID   string
-	Name string
+	ID        string
+	Name      string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:   "id",
-	Name: "name",
+	ID:        "id",
+	Name:      "name",
+	CreatedAt: "created_at",
+	UpdatedAt: "updated_at",
 }
 
 // Generated where
 
 var ArtistWhere = struct {
-	ID   whereHelperint
-	Name whereHelperstring
+	ID        whereHelperint
+	Name      whereHelperstring
+	CreatedAt whereHelpertime_Time
+	UpdatedAt whereHelpertime_Time
 }{
-	ID:   whereHelperint{field: "\"artists\".\"id\""},
-	Name: whereHelperstring{field: "\"artists\".\"name\""},
+	ID:        whereHelperint{field: "\"artists\".\"id\""},
+	Name:      whereHelperstring{field: "\"artists\".\"name\""},
+	CreatedAt: whereHelpertime_Time{field: "\"artists\".\"created_at\""},
+	UpdatedAt: whereHelpertime_Time{field: "\"artists\".\"updated_at\""},
 }
 
 // ArtistRels is where relationship names are stored.
@@ -69,8 +79,8 @@ func (*artistR) NewStruct() *artistR {
 type artistL struct{}
 
 var (
-	artistAllColumns            = []string{"id", "name"}
-	artistColumnsWithoutDefault = []string{"name"}
+	artistAllColumns            = []string{"id", "name", "created_at", "updated_at"}
+	artistColumnsWithoutDefault = []string{"name", "created_at", "updated_at"}
 	artistColumnsWithDefault    = []string{"id"}
 	artistPrimaryKeyColumns     = []string{"id"}
 )
@@ -79,8 +89,6 @@ type (
 	// ArtistSlice is an alias for a slice of pointers to Artist.
 	// This should generally be used opposed to []Artist.
 	ArtistSlice []*Artist
-	// ArtistHook is the signature for custom Artist hook methods
-	ArtistHook func(context.Context, boil.ContextExecutor, *Artist) error
 
 	artistQuery struct {
 		*queries.Query
@@ -108,176 +116,6 @@ var (
 	_ = qmhelper.Where
 )
 
-var artistBeforeInsertHooks []ArtistHook
-var artistBeforeUpdateHooks []ArtistHook
-var artistBeforeDeleteHooks []ArtistHook
-var artistBeforeUpsertHooks []ArtistHook
-
-var artistAfterInsertHooks []ArtistHook
-var artistAfterSelectHooks []ArtistHook
-var artistAfterUpdateHooks []ArtistHook
-var artistAfterDeleteHooks []ArtistHook
-var artistAfterUpsertHooks []ArtistHook
-
-// doBeforeInsertHooks executes all "before insert" hooks.
-func (o *Artist) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range artistBeforeInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *Artist) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range artistBeforeUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *Artist) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range artistBeforeDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *Artist) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range artistBeforeUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterInsertHooks executes all "after Insert" hooks.
-func (o *Artist) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range artistAfterInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterSelectHooks executes all "after Select" hooks.
-func (o *Artist) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range artistAfterSelectHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpdateHooks executes all "after Update" hooks.
-func (o *Artist) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range artistAfterUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *Artist) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range artistAfterDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *Artist) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range artistAfterUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// AddArtistHook registers your hook function for all future operations.
-func AddArtistHook(hookPoint boil.HookPoint, artistHook ArtistHook) {
-	switch hookPoint {
-	case boil.BeforeInsertHook:
-		artistBeforeInsertHooks = append(artistBeforeInsertHooks, artistHook)
-	case boil.BeforeUpdateHook:
-		artistBeforeUpdateHooks = append(artistBeforeUpdateHooks, artistHook)
-	case boil.BeforeDeleteHook:
-		artistBeforeDeleteHooks = append(artistBeforeDeleteHooks, artistHook)
-	case boil.BeforeUpsertHook:
-		artistBeforeUpsertHooks = append(artistBeforeUpsertHooks, artistHook)
-	case boil.AfterInsertHook:
-		artistAfterInsertHooks = append(artistAfterInsertHooks, artistHook)
-	case boil.AfterSelectHook:
-		artistAfterSelectHooks = append(artistAfterSelectHooks, artistHook)
-	case boil.AfterUpdateHook:
-		artistAfterUpdateHooks = append(artistAfterUpdateHooks, artistHook)
-	case boil.AfterDeleteHook:
-		artistAfterDeleteHooks = append(artistAfterDeleteHooks, artistHook)
-	case boil.AfterUpsertHook:
-		artistAfterUpsertHooks = append(artistAfterUpsertHooks, artistHook)
-	}
-}
-
 // One returns a single artist record from the query.
 func (q artistQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Artist, error) {
 	o := &Artist{}
@@ -292,10 +130,6 @@ func (q artistQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Artis
 		return nil, errors.Wrap(err, "models: failed to execute a one query for artists")
 	}
 
-	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
-		return o, err
-	}
-
 	return o, nil
 }
 
@@ -306,14 +140,6 @@ func (q artistQuery) All(ctx context.Context, exec boil.ContextExecutor) (Artist
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to Artist slice")
-	}
-
-	if len(artistAfterSelectHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
-				return o, err
-			}
-		}
 	}
 
 	return o, nil
@@ -433,7 +259,7 @@ func (artistL) LoadTracks(ctx context.Context, e boil.ContextExecutor, singular 
 		one := new(Track)
 		var localJoinCol int
 
-		err = results.Scan(&one.ID, &one.Name, &localJoinCol)
+		err = results.Scan(&one.ID, &one.Name, &one.DurationMS, &one.CreatedAt, &one.UpdatedAt, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for tracks")
 		}
@@ -452,13 +278,6 @@ func (artistL) LoadTracks(ctx context.Context, e boil.ContextExecutor, singular 
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for tracks")
 	}
 
-	if len(trackAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
 	if singular {
 		object.R.Tracks = resultSlice
 		for _, foreign := range resultSlice {
@@ -667,9 +486,15 @@ func (o *Artist) Insert(ctx context.Context, exec boil.ContextExecutor, columns 
 	}
 
 	var err error
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
 
-	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
-		return err
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
+		}
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(artistColumnsWithDefault, o)
@@ -735,17 +560,20 @@ func (o *Artist) Insert(ctx context.Context, exec boil.ContextExecutor, columns 
 		artistInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(ctx, exec)
+	return nil
 }
 
 // Update uses an executor to update the Artist.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *Artist) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
-	var err error
-	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
-		return 0, err
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		o.UpdatedAt = currTime
 	}
+
+	var err error
 	key := makeCacheKey(columns, nil)
 	artistUpdateCacheMut.RLock()
 	cache, cached := artistUpdateCache[key]
@@ -798,7 +626,7 @@ func (o *Artist) Update(ctx context.Context, exec boil.ContextExecutor, columns 
 		artistUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
+	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values.
@@ -872,9 +700,13 @@ func (o *Artist) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOn
 	if o == nil {
 		return errors.New("models: no artists provided for upsert")
 	}
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
 
-	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
-		return err
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(artistColumnsWithDefault, o)
@@ -978,7 +810,7 @@ func (o *Artist) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOn
 		artistUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(ctx, exec)
+	return nil
 }
 
 // Delete deletes a single Artist record with an executor.
@@ -986,10 +818,6 @@ func (o *Artist) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOn
 func (o *Artist) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no Artist provided for delete")
-	}
-
-	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), artistPrimaryKeyMapping)
@@ -1008,10 +836,6 @@ func (o *Artist) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for artists")
-	}
-
-	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	return rowsAff, nil
@@ -1044,14 +868,6 @@ func (o ArtistSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (
 		return 0, nil
 	}
 
-	if len(artistBeforeDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
-	}
-
 	var args []interface{}
 	for _, obj := range o {
 		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), artistPrimaryKeyMapping)
@@ -1074,14 +890,6 @@ func (o ArtistSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for artists")
-	}
-
-	if len(artistAfterDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
 	}
 
 	return rowsAff, nil

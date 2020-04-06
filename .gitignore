@@ -4,3 +4,4 @@ sqlboiler.toml
 
 .idea
 .vscode
+/graph/.graphqlconfig

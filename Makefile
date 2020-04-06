@@ -1,18 +1,25 @@
-include .env
+-include .env
 
-GOPATH=$(shell pwd)/vendor:$(shell pwd)
-GOBIN=$(shell pwd)/bin
-GOFILES=$(wildcard *.go)
-GONAME=$(shell basename "$(PWD)")
+boil:
+	sqlboiler --wipe --no-hooks -o models psql
 
-.PHONY: deps
-sqlboil:
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) sqlboiler --wipe -o pkg/models psql
+gql:
+	go run github.com/99designs/gqlgen
 
-.PHONY: db.migrate
-db.migrate:
-	migrate -path ./db/migrations -database ${DATABASE_URL} up
+db.up:
+	goose -dir ./db/migrations postgres ${DATABASE_URL} up
 
-.PHONY: db.rollback
-db.rollback:
-	migrate -path ./db/migrations -database ${DATABASE_URL} down 1
+db.down:
+	goose -dir ./db/migrations postgres ${DATABASE_URL} down
+
+db.status:
+	goose -dir ./db/migrations postgres ${DATABASE_URL} status
+
+db.reset:
+	goose -dir ./db/migrations postgres ${DATABASE_URL} reset
+
+db.version:
+	goose -dir ./db/migrations postgres ${DATABASE_URL} version
+
+run:
+	go run cmd/server/main.go
