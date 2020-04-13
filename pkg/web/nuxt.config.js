@@ -33,11 +33,25 @@ export default {
    ** Nuxt.js dev-modules
    */
   buildModules: [
-    // Doc: https://github.com/nuxt-community/eslint-module
-    // '@nuxtjs/eslint-module',
-    // Doc: https://github.com/nuxt-community/nuxt-tailwindcss
+    /**
+     * Doc: https://github.com/nuxt-community/nuxt-tailwindcss
+     */
     "@nuxtjs/tailwindcss"
   ],
+  /**
+   * Doc: https://github.com/Developmint/nuxt-purgecss#options
+   */
+  purgeCSS: {
+    extractors: () => [
+      {
+        extractor(content) {
+          // Custom extractor supporting additions for TailwindUI.
+          return content.match(/[\w-/.:]+(?<!:)/g);
+        },
+        extensions: ["html", "vue", "js"]
+      }
+    ]
+  },
   /*
    ** Nuxt.js modules
    */
