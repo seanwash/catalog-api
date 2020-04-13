@@ -1,6 +1,8 @@
 <template>
   <div class="bg-gray-300 p-8 min-h-screen">
-    <nuxt />
+    <div class="container mx-auto">
+      <nuxt />
+    </div>
   </div>
 </template>
 
