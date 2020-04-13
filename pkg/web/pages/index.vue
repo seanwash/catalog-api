@@ -112,7 +112,7 @@ export default {
       }`;
 
     const { data, errors } = await app.$axios.post(
-      "http://localhost:4000/graphql",
+      `${process.env.API_URL}/graphql`,
       { query: query }
     );
 
