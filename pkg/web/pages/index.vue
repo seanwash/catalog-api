@@ -23,8 +23,8 @@
     </div>
     <ul>
       <li v-for="track in tracks" :key="track.id">
-        <a
-          href="#"
+        <nuxt-link
+          :to="`/tracks/${track.id}`"
           class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out"
         >
           <div class="px-4 py-4 sm:px-6">
@@ -32,9 +32,7 @@
               <div
                 class="text-sm leading-5 font-medium text-indigo-600 truncate"
               >
-                <nuxt-link :to="`/tracks/` + track.id">{{
-                  track.name
-                }}</nuxt-link>
+                {{ track.name }}
               </div>
               <div class="ml-2 flex-shrink-0 flex">
                 <span
@@ -95,7 +93,7 @@
               </div>
             </div>
           </div>
-        </a>
+        </nuxt-link>
       </li>
     </ul>
   </div>
