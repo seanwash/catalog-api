@@ -4,6 +4,7 @@ export default {
    ** Headers of the page
    */
   head: {
+    titleTemplate: "%s - Catalog APP",
     title: process.env.npm_package_name || "",
     meta: [
       { charset: "utf-8" },
