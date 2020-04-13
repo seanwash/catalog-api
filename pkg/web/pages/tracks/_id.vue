@@ -94,6 +94,12 @@ export default {
     };
   },
 
+  head() {
+    return {
+      title: this.track.name
+    };
+  },
+
   async asyncData({ app, params, error }) {
     const id = params.id;
 
