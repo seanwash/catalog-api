@@ -41,7 +41,7 @@ func main() {
 	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing
 	r.Use(cors.Handler(cors.Options{
 		// AllowedOrigins: []string{"https://foo.com"}, // Use this to allow specific origin hosts
-		AllowedOrigins:   []string{"*"},
+		AllowedOrigins: []string{"*"},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
@@ -72,8 +72,9 @@ func main() {
 	r.Handle("/", playground.Handler("Catalog API", "/graphql"))
 	r.Handle("/graphql", srv)
 
+	log.Println("Server listening on port " + port)
 	err = http.ListenAndServe(":"+port, r)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Server failed to start: %v", err)
 	}
 }
