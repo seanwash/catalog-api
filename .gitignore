@@ -5,3 +5,5 @@ sqlboiler.toml
 .idea
 .vscode
 /graph/.graphqlconfig
+**/node_modules/
+**/.nuxt/
