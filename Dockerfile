@@ -12,12 +12,13 @@ COPY go.mod .
 COPY go.sum .
 # Get dependencies.
 RUN go mod download
-# Get Goose binary so that the DB migrate fns can be run in the container.
-RUN go get -u github.com/pressly/goose/cmd/goose
 # Copy everything into the Docker container.
 COPY . .
 
+# Compile migrate binary used for running database migrations.
+RUN go build -o /app/bin/migrate ./cmd/migrate/main.go
 # Compile main binary used for starting the server.
 RUN go build -o /app/bin/server ./cmd/server/main.go
+
 # Run server.
 CMD ["/app/bin/server"]

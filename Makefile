@@ -1,10 +1,13 @@
 -include .env
 
-boil:
+gen.boil:
 	sqlboiler --wipe --no-hooks -o models psql
 
-gql:
+gen.gql:
 	go run github.com/99designs/gqlgen
+
+build.migrate:
+	go build -o ./bin/migrate ./cmd/migrate
 
 db.up:
 	goose -dir ./db/migrations postgres ${DATABASE_URL} up

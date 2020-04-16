@@ -16,7 +16,7 @@ Before getting started, note that Docker is configured to run Postgres exposing 
 1. Ensure that Docker is installed & running.
 1. Obtain `.env` file. For development, a `.env.sample` file has been provided with values suitable for this demo. You can copy it and rename the copy to `.env`.
 1. Run `$ docker-compose up -d` from the project root. This will build and start both the Web and Postgres services, keeping them running in the background. If you'd like to see logs, you can skip `-d`, but you'll have to run the following commands in another terminal.
-1. Run `$ docker-compose run --rm web make db.up`. This will run the initial migrations. Note that `--rm` will remove the container that was created to run the command. This is fine since the container we want to keep is already running the web instance.
+1. Run `$ docker-compose run --rm web ./bin/migrate up`. This will run the initial migrations. Note that `--rm` will remove the container that was created to run the command. This is fine since the container we want to keep is already running the web instance.
 1. Run `$ docker-compose run --rm web go run cmd/seeds/main.go`. This will pre-seed the database with some albums from one of my favorite artists, [Plini](https://www.youtube.com/watch?v=oNFXnFAKqAE).
 1. Import the Insomnia export (attached via email) and fire away!
 
